@@ -12,7 +12,7 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 
 ## Features
 
-**Available now (Phase 1)**
+**Available now (Phases 1 and 2)**
 
 - "Start here" welcome with a 30-second explanation
 - Animated journey map of the 10 stages, with five parallel lanes (ProjectLink, Supplier Management, Risk, Quality, Regulatory)
@@ -22,11 +22,13 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 - Hover and click on everything: each term has a one-line tooltip and a drawer with Simple / Expert / In our stretcher / Related tabs
 - Global Simple / Expert switch, light / dark mode, keyboard accessible
 - Full stage pages for stages 1–4: purpose, what happens, Windchill objects and states, sample tables (requirements, hazards, DFMEA, EBOM, alternates vs substitutes, AML, V&V, promotion request, e-signatures), RACI with Part 11 signature markers, audit evidence, pitfalls, best practices
-- Parts and BOM page, searchable A–Z glossary (99 terms so far)
+- Full stage pages for stages 5–10: MBOM and process plan, ERP handoff with Windchill-to-SAP mapping, production with procurement records and a DHR extract, packaging / labeling / UDI, service (spares, warranty, RMA, refurbishment, obsolescence, end of life) and the feedback loop
+- Animated mini-journeys: procurement (MRP → PR → PO → supplier → goods receipt → incoming inspection → stock) and service (field issue → service order → spare part → repair → record → feedback)
+- Follow a part: pick any part and see its digital thread light up, from user need and hazard through CAD, EBOM, test, MBOM, SAP, AML / AVL, purchase order, inspection, DHR, UDI, service kit and CAPA history, with alternates and substitutes explained
+- Parts and BOM page, searchable A–Z glossary (143 terms so far)
 
 **Planned**
 
-- Phase 2: full pages for stages 5–10, procurement and service animations, "follow a part" digital thread
 - Phase 3: brake complaint → CAPA story, role views, QMS module map, 150+ glossary terms, guided "Play the journey" tour
 
 ## Structure
@@ -35,7 +37,7 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 | --- | --- |
 | `index.html` | Page shell |
 | `styles.css` | Design tokens (light / dark) and all styling |
-| `data.js` | The single data object `window.MD`: product, roles, systems, flows, lanes, stages, parts |
+| `data.js` | The single data object `window.MD`: product, roles, systems, flows, lanes, stages, parts, mini-flows, part threads |
 | `data-terms.js` | Glossary terms, added to `MD.terms` |
 | `stretcher3d.js` | Procedural 3D stretcher and lifecycle looks |
 | `app.js` | Renders the UI from the data: map, drawer, pages, routing |

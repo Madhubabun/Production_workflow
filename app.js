@@ -189,7 +189,7 @@
         { label: 'In the BOM', html:
           '<dl class="kv"><dt>Used in</dt><dd>' + (parent ? rich('[[p:' + parent.id + ']]') + ' ' + esc(parent.name) : 'Top level: this is the finished device') + '</dd>' +
           '<dt>Contains</dt><dd>' + (kids.length ? kids.map(function (c) { return rich('[[p:' + c.id + ']]') + ' ' + esc(c.name); }).join('<br>') : 'No lower-level parts listed') + '</dd></dl>' + altHtml +
-          '<p class="tnote">The full digital thread of this part (requirements, tests, purchase orders, lots, service history) arrives in Phase 2.</p>' },
+          '<p><button type="button" class="btn" data-trace-pick="' + p.id + '">Follow this part\'s journey</button></p>' },
         { label: 'Related', html:
           (p.rel ? '<h3>Connected terms</h3><div class="rel">' + p.rel.map(function (r) { return termBtn(r); }).join('') + '</div>' : '') +
           (used.length ? '<h3>Appears in stages</h3><div class="rel">' + stageChips(used) + '</div>' : '') }
@@ -224,7 +224,7 @@
       '<p class="lead">' + (state.level === 'expert'
         ? rich('This site follows one product through [[creo]], [[windchill]] 13, [[sap]] and [[mes]] under [[qmsr]], [[iso13485]], [[iso14971]] and [[eumdr]], with sample objects, states, records and audit evidence at each step.')
         : 'This site follows one stretcher through all 10 stages. Every underlined word explains itself: hover for one line, click for the full story.') + '</p>' +
-      '<div class="w-actions"><button type="button" class="btn" data-go-stage="1">Begin at stage 1</button><a class="btn ghost" href="#glossary">Open the glossary</a></div></div>' +
+      '<div class="w-actions"><button type="button" class="btn" data-go-stage="1">Begin at stage 1</button><a class="btn ghost" href="#trace">Follow a part</a><a class="btn ghost" href="#glossary">Open the glossary</a></div></div>' +
       '<div class="how"><h3>How to use this page</h3><ol>' +
       '<li><span><b>Pick a stage</b> on the journey map. The 3D stretcher changes its look to match: sketch, CAD model, managed in Windchill, built, packed, in use.</span></li>' +
       '<li><span><b>Hover or click anything underlined</b>, such as ' + rich('[[udi]] or [[ebom]]') + ', and any part of the 3D model.</span></li>' +
@@ -274,7 +274,7 @@
       MD.lanes.map(function (l) { return '<li><b>' + rich('[[' + l.term + '|' + l.name + ']]') + '</b><span>' + rich(l.cells[s.n - 1]) + '</span></li>'; }).join('') + '</ul></div>' +
       '<div class="w-actions"><a class="btn" href="#stage-' + s.n + '">Open the stage ' + s.n + ' page</a>' +
       (s.n < MD.stages.length ? '<button type="button" class="btn ghost" data-stage-sel="' + (s.n + 1) + '">Next stage →</button>' : '') + '</div>' +
-      (s.full ? '' : '<p class="tnote">The summary is shown now. Tables, RACI and sample records for this stage arrive in Phase 2.</p>');
+      '';
     $('#stagePanel').innerHTML = h; $('#stagePanel').style.setProperty('--c', 'var(--s' + s.n + ')');
   }
 
@@ -378,6 +378,7 @@
       h += '<section class="sec"><p class="notice">This stage shows its summary now. The full page with sample tables, Windchill objects, RACI, compliance evidence, pitfalls and best practices arrives in Phase 2.</p></section>';
     } else {
       h += '<section class="sec"><h2>What happens to our stretcher</h2>' + list(lv(s.happens)) + '</section>';
+      if (s.mini) h += '<section class="sec">' + miniHtml(s.mini) + '</section>';
       h += '<section class="sec"><h2>Windchill objects and lifecycle states</h2>' + table({ cols: ['What', 'Windchill object', 'States and notes'], rows: s.objects }) + '</section>';
       h += '<section class="sec"><h2>Sample data</h2>' + s.tables.map(function (t) { return table(t); }).join('') + '</section>';
       h += '<div class="cols2"><section class="sec"><h2>Quality system processes involved</h2>' + list(s.qms) + '</section>' +
@@ -399,9 +400,9 @@
       '<p class="tag">' + rich(state.level === 'expert'
         ? 'The released [[ebom]] of [[p:MC-STR-3000]] at revision A. Select a row for attributes, [[alternate]] and [[substitute]] parts.'
         : 'Everything the stretcher is made of. Select a row to see what the part does and where it comes from.') + '</p></header>';
-    h += '<section class="sec"><div class="table-scroll"><table><thead><tr><th>Number</th><th>Name</th><th>Qty</th><th>Rev</th><th>Make / Buy</th><th>Material</th><th>Supplier (invented)</th><th>Criticality</th><th>Lead time</th></tr></thead><tbody>' +
+    h += '<section class="sec"><div class="table-scroll"><table><thead><tr><th>Number</th><th>Name</th><th>Qty</th><th>Rev</th><th>Make / Buy</th><th>Material</th><th>Supplier (invented)</th><th>Criticality</th><th>Lead time</th><th>Journey</th></tr></thead><tbody>' +
       MD.parts.map(function (p) {
-        return '<tr class="rowbtn" data-part="' + p.id + '"><td class="mono ind' + p.lvl + '"><button type="button" class="term plink" data-part="' + p.id + '">' + p.id + '</button></td><td>' + esc(p.name) + (p.opt ? ' <span class="pill">' + esc(p.opt) + '</span>' : '') + '</td><td>' + p.qty + '</td><td>' + p.rev + '</td><td>' + esc(p.mb) + '</td><td>' + esc(p.mat) + '</td><td>' + esc(p.sup) + '</td><td>' + critPill(p.crit) + '</td><td>' + esc(p.lead) + '</td></tr>';
+        return '<tr class="rowbtn" data-part="' + p.id + '"><td class="mono ind' + p.lvl + '"><button type="button" class="term plink" data-part="' + p.id + '">' + p.id + '</button></td><td>' + esc(p.name) + (p.opt ? ' <span class="pill">' + esc(p.opt) + '</span>' : '') + '</td><td>' + p.qty + '</td><td>' + p.rev + '</td><td>' + esc(p.mb) + '</td><td>' + esc(p.mat) + '</td><td>' + esc(p.sup) + '</td><td>' + critPill(p.crit) + '</td><td>' + esc(p.lead) + '</td><td><button type="button" class="chip" data-trace-pick="' + p.id + '">Follow</button></td></tr>';
       }).join('') + '</tbody></table></div>' +
       '<p class="tnote">Indented rows belong to the assembly above them. Costs and lead times are sample values.</p></section>';
     h += '<section class="sec"><h2>Product variants</h2>' + table({ cols: ['Variant', 'Name', 'What is different'], rows: MD.product.variants.map(function (v) { return [v.code, v.name, v.note]; }) }) +
@@ -433,6 +434,109 @@
     }).join('') : '<p class="notice">No term matches "' + esc(state.gq) + '". Try a shorter word.</p>';
   }
 
+  /* ---------------- MINI-FLOWS (procurement, service) ---------------- */
+  var miniState = {};
+  function miniHtml(id) {
+    var f = MD.miniFlows[id];
+    return '<div class="mini" data-mini="' + id + '"><div class="card-h"><h3>' + esc(f.title) + '</h3>' +
+      '<button type="button" class="chip" data-mini-play aria-label="Pause or play this animation">Pause</button></div>' +
+      '<ol class="mini-steps">' + f.steps.map(function (s, i) {
+        return '<li><button type="button" data-mini-step="' + i + '"><b>' + (i + 1) + '</b><span>' + esc(s.l) + '</span><small>' + esc(s.sys) + '</small></button></li>';
+      }).join('') + '</ol><div class="mini-cap"></div></div>';
+  }
+  function miniShow(el) {
+    var id = el.getAttribute('data-mini'), f = MD.miniFlows[id];
+    var st = miniState[id] || (miniState[id] = { i: 0, play: !reduced });
+    $$('.mini-steps li', el).forEach(function (li, k) { li.className = k === st.i ? 'on' : (k < st.i ? 'done' : ''); });
+    var s = f.steps[st.i];
+    $('.mini-cap', el).innerHTML = '<p><b>Step ' + (st.i + 1) + ' of ' + f.steps.length + ' · ' + esc(s.l) + '.</b> ' + rich(s.t) + '</p><p class="rec"><span>Sample record</span>' + esc(s.r) + '</p>';
+    $('[data-mini-play]', el).textContent = st.play ? 'Pause' : 'Play';
+  }
+  function initMinis() { $$('.mini').forEach(miniShow); }
+  setInterval(function () {
+    $$('.mini').forEach(function (el) {
+      if (el.offsetParent === null) return;
+      var st = miniState[el.getAttribute('data-mini')]; if (!st || !st.play) return;
+      st.i = (st.i + 1) % MD.miniFlows[el.getAttribute('data-mini')].steps.length; miniShow(el);
+    });
+  }, 2800);
+
+  /* ---------------- TRACER: follow one part through its digital thread ---------------- */
+  var trace = { part: store.get('md-trace', 'MC-CST-6000'), timer: 0 };
+  function threadSteps(p) {
+    var th = MD.threads[p.id] || {}, buy = p.mb === 'Buy', idx = MD.parts.indexOf(p), parent = null;
+    for (var i = idx - 1; i >= 0; i--) { if (MD.parts[i].lvl < p.lvl) { parent = MD.parts[i]; break; } }
+    var isAsm = idx + 1 < MD.parts.length && MD.parts[idx + 1].lvl > p.lvl || /assembly|weldment|frame|module/i.test(p.name);
+    var amlHtml = Array.isArray(th.aml)
+      ? '<div class="table-scroll"><table><thead><tr><th>Manufacturer part</th><th>Manufacturer</th><th>AML preference</th></tr></thead><tbody>' +
+        th.aml.map(function (a) { return '<tr><td class="mono">' + esc(a[0]) + '</td><td>' + esc(a[1]) + '</td><td>' + esc(a[2]) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+        (th.avl ? '<p>' + rich('[[avl|Approved vendors]] for Plant 1000: ') + esc(th.avl) + '.</p>' : '')
+      : '<p>' + esc(th.aml || 'Made in-house: no manufacturer list needed.') + '</p>';
+    return [
+      { st: 1, k: 'User need', term: 'user-need', t: th.un },
+      { st: 1, k: 'Design input', term: 'design-input', t: th.di },
+      { st: 1, k: 'Hazard', term: 'hazard', t: th.haz },
+      { st: 2, k: 'Risk control', term: 'risk-control', t: th.rc },
+      { st: 2, k: 'Creo model and drawing', term: 'cad-document', t: p.nomodel ? 'No 3D model: label artwork ART-LBL-9000 is the controlled design output, revision ' + p.rev + ', Released.' : p.id + (isAsm ? '.asm' : '.prt') + ' and ' + p.id + '.drw, revision ' + p.rev + ', Released.' },
+      { st: 3, k: 'WTPart in the EBOM', term: 'wtpart', t: p.id + ', revision ' + p.rev + ', ' + p.state + (th.find ? ' · find number ' + th.find : '') + ' · quantity ' + p.qty + (parent ? ' in ' + parent.id : ' (top level)') + '.' },
+      { st: 4, k: 'Verification test', term: 'verification', t: th.vt },
+      { st: 5, k: 'MBOM line, operation and bench', term: 'mbom', t: th.mb },
+      { st: 6, k: 'SAP material', term: 'material-master', t: 'Material ' + p.id + ' · plant 1000 · procurement type ' + (buy ? 'F (bought)' : 'E (made in-house)') + ' · revision level ' + p.rev + (/critical|related|contact/i.test(p.crit) ? ' · quality inspection active' : '') + '.' },
+      { st: 5, k: 'Manufacturer and vendor parts (AML / AVL)', term: 'aml', html: amlHtml },
+      { st: 7, k: buy ? 'Purchase order and supplier' : 'Production order', term: buy ? 'po' : 'production-order', t: th.po },
+      { st: 7, k: buy ? 'Incoming inspection' : 'In-process inspection', term: 'inspection-lot', t: th.insp },
+      { st: 7, k: 'Production lot / serial in the DHR', term: 'dhr', t: th.lot },
+      { st: 8, k: 'UDI', term: 'udi', t: 'Built into a stretcher labelled ' + MD.product.udiSample + '. The stretcher serial leads back to this part\'s lot through the DHR.' },
+      { st: 9, k: 'Service part / spare kit', term: 'service-part', t: th.svc },
+      { st: 10, k: 'Complaints and CAPA history', term: 'capa', t: th.hist }
+    ];
+  }
+  function renderTracePage() {
+    var p = partById[trace.part] || partById['MC-CST-6000'], th = MD.threads[p.id] || {}, steps = threadSteps(p);
+    var h = crumbs([['Journey', '#home'], ['Follow a part']]) +
+      '<header class="page-head" style="--c:var(--s7)"><div class="kicker">Digital thread</div><h1>Follow one part through its whole journey</h1>' +
+      '<p class="tag">' + rich(state.level === 'expert'
+        ? 'Pick a part. The thread shows its [[traceability]] chain: requirement, risk, design, test, manufacturing, sourcing, production record, [[udi]], service and feedback.'
+        : 'Pick a part. See where it came from, why it exists, who makes it, how it is checked, and what happened to it later.') + '</p></header>';
+    h += '<section class="sec"><h2>Choose a part</h2><div class="chips">' + MD.parts.map(function (x) {
+      return '<button type="button" class="chip' + (x.opt ? ' opt' : '') + '" data-trace-pick="' + x.id + '" aria-pressed="' + (x.id === p.id) + '" data-tip="' + esc(x.id) + '">' + esc(x.name) + '</button>';
+    }).join('') + '</div></section>';
+    h += '<div class="trace-grid"><section class="sec trace-sum"><div><div class="kicker">' + p.id + '</div><h2 style="font-size:1.3rem">' + esc(p.name) + '</h2></div>' +
+      '<p>' + rich(lv({ s: p.s, x: p.x })) + '</p><dl class="kv">' +
+      '<dt>Revision / state</dt><dd>' + p.rev + ' · ' + esc(p.state) + '</dd>' +
+      '<dt>Material</dt><dd>' + esc(p.mat) + '</dd>' +
+      '<dt>' + rich('[[make-buy]]') + '</dt><dd>' + esc(p.mb) + '</dd>' +
+      '<dt>Supplier(s)</dt><dd>' + esc(p.sup) + '</dd>' +
+      '<dt>' + rich('[[aml|Approved manufacturers]]') + '</dt><dd>' + (Array.isArray(th.aml) ? th.aml.map(function (a) { return esc(a[1] + ' ' + a[0] + ' (' + a[2] + ')'); }).join('<br>') : esc(th.aml || '—')) + '</dd>' +
+      '<dt>' + rich('[[alternate|Alternate parts]]') + '</dt><dd>' + (p.alt ? p.alt.map(function (a) { return '<span class="mono">' + a.id + '</span> ' + esc(a.name); }).join('<br>') : 'None') + '</dd>' +
+      '<dt>' + rich('[[substitute|Substitute parts]]') + '</dt><dd>' + (p.sub ? p.sub.map(function (a) { return '<span class="mono">' + a.id + '</span> ' + esc(a.name) + ' (only in ' + p.id + ')'; }).join('<br>') : 'None') + '</dd>' +
+      '<dt>Lead time</dt><dd>' + esc(p.lead) + '</dd><dt>Cost (sample)</dt><dd>' + esc(p.cost) + '</dd>' +
+      '<dt>Criticality</dt><dd>' + critPill(p.crit) + '</dd>' +
+      '<dt>' + rich('[[material-compliance|Compliance]]') + '</dt><dd>' + esc(th.comp || '—') + '</dd></dl>' +
+      '<div class="diff"><div><b>Alternate</b>Interchangeable everywhere the part is used.</div><div><b>Substitute</b>Allowed only in one named assembly.</div></div>' +
+      '<p><button type="button" class="btn ghost" data-show3d="' + p.id + '">Show it on the 3D stretcher</button></p></section>';
+    h += '<section class="sec"><div class="card-h"><h2>Its digital thread</h2><button type="button" class="chip" data-trace-replay>Replay</button></div>' +
+      '<div class="map-scroll"><div class="trace-rail" id="traceRail">' + MD.stages.map(function (s) {
+        return '<a href="#stage-' + s.n + '" class="trace-node" data-rail="' + s.n + '" style="--c:var(--s' + s.n + ')" data-tip="' + esc(s.n + ' · ' + s.name) + '">' + icon(s.n) + '<span>' + esc(s.short) + '</span></a>';
+      }).join('') + '</div></div><ol class="thread" id="thread">' + steps.map(function (s, i) {
+        return '<li style="--c:var(--s' + s.st + ')" data-st="' + s.st + '"><span class="th-n">' + (i + 1) + '</span><div><h3>' + rich('[[' + s.term + '|' + s.k + ']]') + ' <a class="th-stage" href="#stage-' + s.st + '">Stage ' + s.st + ' · ' + esc(MD.stages[s.st - 1].short) + '</a></h3>' +
+          (s.html || '<p>' + esc(s.t || 'No record for this part.') + '</p>') + '</div></li>';
+      }).join('') + '</ol></section></div>';
+    return h;
+  }
+  function playTrace() {
+    clearInterval(trace.timer);
+    var items = $$('#thread li'), rail = $$('#traceRail .trace-node'), i = 0;
+    function light(n) {
+      items.forEach(function (li, k) { li.classList.toggle('lit', k < n); });
+      var seen = {}; items.slice(0, n).forEach(function (li) { seen[li.getAttribute('data-st')] = 1; });
+      rail.forEach(function (a) { a.classList.toggle('lit', !!seen[a.getAttribute('data-rail')]); a.classList.toggle('now', n > 0 && n <= items.length && items[n - 1].getAttribute('data-st') === a.getAttribute('data-rail')); });
+    }
+    if (reduced) { light(items.length); return; }
+    light(0);
+    trace.timer = setInterval(function () { i++; light(i); if (i >= items.length) clearInterval(trace.timer); }, 320);
+  }
+
   /* ---------------- routing ---------------- */
   function route() {
     var hsh = (location.hash || '#home').slice(1), page = $('#page'), home = $('#home');
@@ -441,7 +545,10 @@
     if (m && n >= 1 && n <= MD.stages.length) { state.route = 'stage'; state.stage = n; page.innerHTML = renderStagePage(n); }
     else if (hsh === 'parts') { state.route = 'parts'; page.innerHTML = renderPartsPage(); }
     else if (hsh === 'glossary') { state.route = 'glossary'; page.innerHTML = renderGlossaryPage(); fillGlossary(); }
+    else if (hsh === 'trace') { state.route = 'trace'; page.innerHTML = renderTracePage(); playTrace(); }
     else { state.route = 'home'; }
+    if (hsh !== 'trace') clearInterval(trace.timer);
+    initMinis();
     var isHome = state.route === 'home';
     home.hidden = !isHome; page.hidden = isHome;
     $$('.nav a').forEach(function (a) { var on = a.getAttribute('data-nav') === state.route; if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
@@ -478,6 +585,14 @@
       setTimeout(function () { if (window.Stretcher3D) window.Stretcher3D.select(pid, true); var v = $('.viewer-card'); if (v) v.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); }, 60);
       return;
     }
+    if ((el = t.closest('[data-trace-pick]'))) {
+      trace.part = el.getAttribute('data-trace-pick'); store.set('md-trace', trace.part); closeDrawer();
+      if (location.hash === '#trace') { var sy = window.scrollY; route(); window.scrollTo(0, sy); } else location.hash = '#trace';
+      return;
+    }
+    if ((el = t.closest('[data-trace-replay]'))) { playTrace(); return; }
+    if ((el = t.closest('[data-mini-step]'))) { var mEl = el.closest('.mini'), ms = miniState[mEl.getAttribute('data-mini')]; ms.i = +el.getAttribute('data-mini-step'); ms.play = false; miniShow(mEl); return; }
+    if ((el = t.closest('[data-mini-play]'))) { var mEl2 = el.closest('.mini'), ms2 = miniState[mEl2.getAttribute('data-mini')]; ms2.play = !ms2.play; miniShow(mEl2); return; }
     if ((el = t.closest('[data-term]'))) { e.preventDefault(); openTerm(el.getAttribute('data-term')); return; }
     if ((el = t.closest('[data-lane]'))) { openLane(el.getAttribute('data-lane'), +el.getAttribute('data-lane-stage') || 0); return; }
     if ((el = t.closest('[data-part]'))) { openPart(el.getAttribute('data-part')); return; }
@@ -534,6 +649,7 @@
   // follow the theme the host or operating system chooses
   new MutationObserver(function () { if (window.Stretcher3D) window.Stretcher3D.setTheme(currentTheme()); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', function () { if (window.Stretcher3D) window.Stretcher3D.setTheme(currentTheme()); }); }
+  $('#minis').innerHTML = miniHtml('procurement') + miniHtml('service');
   renderWelcome();
   route();
   pk.raf = requestAnimationFrame(tickPackets);

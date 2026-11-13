@@ -621,4 +621,280 @@
     `R = performs the work; A = single owner who approves; C = two-way input before the decision; I = one-way notification after. Used here per stage; tasks marked with a pen need a [[part11]] [[esign|electronic signature]].`,
     `For "Approve release": Change Admin R, Quality and Regulatory A, Design and Manufacturing C.`,
     'esign ccb');
+
+  /* ================= Phase 2 additions ================= */
+
+  /* ---------------- Manufacturing planning ---------------- */
+  T('bom-transformer', 'BOM Transformer', 'BOM', `The MPMLink screen where the engineering BOM is turned into the manufacturing BOM.`,
+    `A side-by-side screen: engineering's parts list on the left, the factory's on the right. Parts are dragged across and regrouped.`,
+    `Sorting shopping from "by recipe" into "by shop aisle" without losing an item.`,
+    `Windchill [[mpmlink]] tool (earlier name: Manufacturing Associative BOM / MAPSB) showing upstream [[ebom]] and downstream [[mbom]]. Actions create downstream parts, new manufacturing assemblies and equivalence links; it reports parts not yet consumed and detects upstream changes for reconciliation. Screen names vary by release {V}.`,
+    `The four castors and the brake linkage are moved under the new manufacturing assembly MC-MFG-0100 "Chassis complete".`,
+    'mbom ebom mpmlink views');
+  T('process-plan', 'Process Plan', 'ERP & factory', `The step-by-step recipe for building the product in a given plant.`,
+    `The list of build steps in order: what to do, where, with which tool and parts, and how long it takes.`,
+    `A recipe's method section: step 1, step 2, step 3.`,
+    `Windchill [[mpmlink]] object holding a sequence of [[operation]]s for a part in a plant. Links to the [[mbom]] (part allocation), [[work-center]]s, [[tooling]], time standards, control characteristics and [[work-instruction]]s. Published to ERP as a [[routing]] and to MES.`,
+    `PP-T300-01 for Plant 1000 has operations OP10 to OP80 across benches B1–B4 and packing station PK1.`,
+    'operation work-center routing mpmlink work-instruction');
+  T('operation', 'Operation', 'ERP & factory', `One step in the process plan, done at one bench.`,
+    `A single build step, such as "fit the castors", with its parts, tools and checks.`,
+    `One numbered step in a recipe.`,
+    `Element of a [[process-plan]] / [[routing]]: number, description, [[work-center]], setup and run time, allocated components, [[tooling]], inspection characteristics. In MES each operation is started, executed with data collection, and confirmed.`,
+    `OP20 at bench B1: brake function test on rig TR-02, 4 minutes, record holding torque on each castor.`,
+    'process-plan work-center station routing');
+  T('work-center', 'Work Center', 'ERP & factory', `A place in the plant where operations are done: a bench, a machine or a line section.`,
+    `A named workplace in the factory. Each build step is assigned to one.`,
+    `A station in a kitchen: the grill, the prep table.`,
+    `Resource in Windchill MPMLink and SAP PP (work centre) with capacity, cost centre and capabilities. Operations reference it; scheduling and costing use it.`,
+    `Work centre B1-1000 = bench B1 on line L1 in Plant 1000, used by OP10 and OP20.`,
+    'station operation process-plan routing');
+  T('station', 'Station / Bench', 'ERP & factory', `The physical workplace where an operator performs a step.`,
+    `The actual table or bay with its tools, screen and part bins where someone builds part of the stretcher.`,
+    `A cook's own counter with everything within reach.`,
+    `The shop-floor instance of a [[work-center]]: equipped with fixtures, calibrated tools, an MES terminal and line-side stock. Layout and equipment are part of process validation.`,
+    `Bench B1 has chassis fixture FX-0012, torque wrench TL-0031 and brake test rig TR-02.`,
+    'work-center tooling mes');
+  T('tooling', 'Tooling', 'ERP & factory', `Tools, fixtures and test equipment needed for an operation.`,
+    `The special equipment a step needs: a jig to hold the frame, a torque wrench, a test rig.`,
+    `The right pan and thermometer for a recipe step.`,
+    `Managed as resource parts in MPMLink and allocated to [[operation]]s; measuring tools are under calibration control ([[iso13485]] 7.6) and their IDs are recorded in the [[dhr]].`,
+    `TL-0031 torque wrench 5–50 N·m, calibration due 2025-12, recorded on every OP10.`,
+    'operation station dhr');
+  T('consumable', 'Consumable', 'BOM', `Material used up during production that is not a discrete part, such as glue, oil or thread-lock.`,
+    `Things the factory uses a little of on each unit: a drop of thread-lock, some oil.`,
+    `Salt and oil in a recipe.`,
+    `Listed in the [[mbom]] with a quantity and unit (ml, g) or as bulk material; lot traceability may be required when it affects safety. Usually absent from the CAD model.`,
+    `MC-CON-0007 thread-lock, 0.5 ml per stretcher, on the brake clamp screws.`,
+    'mbom phantom kit');
+  T('work-instruction', 'Work Instruction', 'ERP & factory', `The illustrated, step-by-step instruction the operator follows.`,
+    `What the worker sees on the screen at the bench: pictures and short text for each action.`,
+    `The picture guide for assembling flat-pack furniture.`,
+    `Controlled document generated from or linked to the [[process-plan]] [[operation]], with 3D illustrations from released CAD, torque values and checks. Released under document control; operators are trained on the current revision.`,
+    `WI-OP10 shows the castor orientation and the 25 N·m torque for each stem.`,
+    'process-plan operation mes');
+  T('process-validation', 'Process validation (IQ / OQ / PQ)', 'Quality', `Proof that a production process consistently gives a good result.`,
+    `Where the result of a process cannot be fully checked afterwards (a weld, a coating), the process itself is proven reliable beforehand.`,
+    `Proving an oven bakes evenly, so each loaf need not be cut open.`,
+    `[[iso13485]] 7.5.6. Installation qualification (equipment installed correctly), operational qualification (works across its settings), performance qualification (consistently produces acceptable product). Includes software used in production.`,
+    `Frame welding and powder coating for MC-FRM-1000 were validated before the pilot build.`,
+    'design-transfer control-plan pfmea');
+  T('control-plan', 'Control plan', 'Quality', `The list of checks done during production, with method, frequency and reaction.`,
+    `A table saying what is checked at each step, how, how often, and what to do if it fails.`,
+    `A food-safety check sheet: fridge temperature, twice a day, call the manager if above 5 °C.`,
+    `Derived from the [[pfmea]] detection controls and drawing critical characteristics; implemented as MES data-collection points and [[sap-qm]] inspection plans.`,
+    `OP20: 100 % brake torque test, limit ≥ 12 N·m, fail → NC and bench stop.`,
+    'pfmea inspection-lot sap-qm');
+  T('sourcing-context', 'Sourcing context', 'Supplier', `The scope (such as a plant) in which a supplier approval is valid.`,
+    `A supplier approved for one factory is not automatically approved for another. The sourcing context says where the approval counts.`,
+    `A parking permit valid for one zone only.`,
+    `Windchill Supplier Management concept: [[aml]] / [[avl]] preferences are stored per sourcing context, typically a plant or business unit {V}.`,
+    `In context "Plant 1000", Dextrin Industrial Supply is Approved for MC-CST-6000.`,
+    'aml avl suma vendor-part');
+  T('kit', 'Kit', 'BOM', `A set of items handled and issued together under one number.`,
+    `Several items bundled so they can be picked or ordered as one, such as everything for packing or for one repair.`,
+    `A ready-packed sewing kit.`,
+    `BOM structure whose components are picked together; in ERP it may be a kit material or a phantom. Used for packaging sets and service [[spare-kit]]s.`,
+    `MC-PKG-9100 Packaging set: carton, protectors, bag, IFU, quick guide.`,
+    'spare-kit phantom packaging-bom');
+
+  /* ---------------- ERP, purchasing, production ---------------- */
+  T('bom', 'BOM', 'BOM', `Bill of Materials: the structured list of items that make up a product.`,
+    `The complete ingredient list of a product, with quantities.`,
+    `The ingredients section of a recipe.`,
+    `Hierarchical parent–component structure with quantities and units. Variants by purpose: [[ebom]], [[mbom]], [[sbom]], [[packaging-bom]]. In SAP, the BOM (transaction family CS01–CS03) has a usage (production, sales, plant maintenance) and validity dates.`,
+    `The SAP production BOM of MC-STR-3000 for plant 1000 comes from the Windchill MBOM.`,
+    'ebom mbom sbom packaging-bom routing');
+  T('routing', 'Routing', 'ERP & factory', `SAP's list of production steps for a material: the counterpart of the process plan.`,
+    `SAP's version of the build recipe: which steps, at which work centres, for how long.`,
+    `The method section of the recipe, as the kitchen's planning system stores it.`,
+    `SAP PP task list with operations, work centres, standard values, component allocation and inspection characteristics; used for scheduling, capacity and costing. Created from the Windchill [[process-plan]] via [[esi]].`,
+    `Routing group 50001234 for MC-STR-3000, operations 0010–0080.`,
+    'process-plan operation work-center bom');
+  T('mrp', 'MRP', 'ERP & factory', `Material Requirements Planning: the calculation of what must be bought or made, and when.`,
+    `The system looks at what is to be built, what is in stock and how long things take, then says what to order today.`,
+    `Checking the fridge against next week's menu and writing the shopping list.`,
+    `SAP MRP run explodes the [[bom]] against demand, nets stock and open orders, applies lead times and lot sizes, and creates planned orders or purchase requisitions ([[pr]]).`,
+    `For 20 stretchers MRP needs 80 castors; with 42 days lead time it proposes ordering by 14 July.`,
+    'pr po bom material-master');
+  T('pr', 'Purchase Requisition (PR)', 'ERP & factory', `An internal request to buy something.`,
+    `A note inside the company saying "we need 400 castors by this date". It is not yet an order.`,
+    `Writing an item on the family shopping list.`,
+    `SAP MM document created by [[mrp]] or manually; assigned a source of supply from the source list and converted into a purchase order ([[po]]).`,
+    `PR 0010045871: 400 × MC-CST-6000 for plant 1000.`,
+    'mrp po avl');
+  T('po', 'Purchase Order (PO)', 'ERP & factory', `The binding order sent to a supplier.`,
+    `The official order to the supplier: what, how many, what price, when, and to which drawing revision.`,
+    `Placing the order at the shop counter.`,
+    `SAP MM document to an approved vendor ([[avl]]); references material, revision level, quality requirements (certificates), delivery date. Purchasing information must be adequate per [[iso13485]] 7.4.2.`,
+    `PO 4500012345 to Norvale Castor Works: 400 castors, drawing revision A, certificate of conformity required.`,
+    'pr goods-receipt avl');
+  T('goods-receipt', 'Goods receipt', 'ERP & factory', `Booking delivered goods into the system when they arrive.`,
+    `The warehouse confirms: the delivery is here, this many pieces, from this order.`,
+    `Signing for a parcel at the door.`,
+    `SAP material document (movement type 101) against the [[po]]; for QM-relevant materials the stock posts to quality inspection and an [[inspection-lot]] is created automatically. The supplier batch is recorded for traceability.`,
+    `Material document 5000098812: 400 castors, supplier lot NCW-L2509, to inspection stock.`,
+    'po inspection-lot serial-lot');
+  T('inspection-lot', 'Inspection lot', 'ERP & factory', `SAP's record for checking a delivery or production quantity.`,
+    `A check job: take a sample from the delivery, measure it, and decide whether the whole delivery may be used.`,
+    `Tasting a spoonful before serving the pot.`,
+    `[[sap-qm]] object created at goods receipt (type 01), in production (03 / 04) or other events. Holds sample size, characteristics, results and the usage decision that releases or blocks the stock.`,
+    `Lot 010000004711: 13 of 400 castors tested, brake torque 13.1–14.6 N·m, usage decision A (accept).`,
+    'sap-qm goods-receipt nc control-plan');
+  T('sap-qm', 'SAP QM', 'ERP & factory', `The quality management part of SAP: inspections, results, quality notifications.`,
+    `The part of SAP that handles checks on incoming goods and in production, and records quality problems.`,
+    `The quality inspector's desk inside the business system.`,
+    `SAP Quality Management: inspection planning (inspection plans, master inspection characteristics), inspection processing ([[inspection-lot]], results, usage decision), quality notifications, certificates. Complements Windchill's quality records {V}.`,
+    `QM view of MC-CST-6000: inspection type 01 active, certificate required.`,
+    'inspection-lot material-master nc');
+  T('production-order', 'Production order', 'ERP & factory', `The instruction to build a quantity of a product by a date.`,
+    `The factory's job ticket: build 20 stretchers of this type, starting Monday.`,
+    `A kitchen order slip.`,
+    `SAP PP order created from a planned order; copies the valid [[bom]] and [[routing]] (per [[effectivity]]), reserves components, and is released to [[mes]] for execution. Confirmations and goods receipt close it.`,
+    `Production order 1000234: 20 × T-300P, serials T3P-250001 to -250020.`,
+    'mes routing bom dhr');
+  T('serial-lot', 'Serial number / Lot', 'ERP & factory', `A serial number identifies one unit. A lot (batch) number identifies a group made together.`,
+    `Each stretcher has its own serial number. Small parts are tracked in groups called lots, made in one run.`,
+    `A passport number for one person; a class name for a whole school class.`,
+    `Identification per [[iso13485]] 7.5.8 / 7.5.9. Serial and lot are also [[udi-pi]] elements. Component lots consumed are recorded against the finished serial (genealogy) in the [[dhr]].`,
+    `Stretcher serial T3P-250001 contains castors of lot NCW-L2509.`,
+    'traceability dhr udi-pi');
+  T('mrb', 'MRB', 'Quality', `Material Review Board: the group that decides what happens to nonconforming material.`,
+    `A small team from quality, engineering and production that decides: fix it, send it back, scrap it, or use it with a written justification.`,
+    `A panel deciding what to do with a damaged delivery.`,
+    `Disposition authority under [[iso13485]] 8.3. "Use as is" requires justification and, where applicable, concession approval and regulatory check; rework needs an approved instruction and re-inspection.`,
+    `MRB decided to rework three scratched side rails under NC-2025-0031.`,
+    'nc capa scar');
+  T('deviation', 'Deviation / Variance', 'Change', `A temporary, approved permission to depart from the released definition.`,
+    `A one-time written permission, for a limited quantity or time, to use something slightly different from the drawing.`,
+    `A doctor's note excusing one day, not a change of the rules.`,
+    `Windchill variance object (deviation before the fact, waiver after) with affected objects, quantity or date limits and approvals {V}. Does not change the released revision; a permanent change needs a [[change-notice]].`,
+    `A deviation could allow 200 castors with an alternative tread colour while the supplier's standard compound is on back-order.`,
+    'nc mrb change-notice');
+
+  /* ---------------- Packaging, labeling, market ---------------- */
+  T('packaging-bom', 'Packaging BOM', 'BOM', `The parts list of the packaging: carton, protectors, manuals.`,
+    `Everything that goes around and with the product in the box, listed like any other parts list.`,
+    `The gift-wrap list: box, paper, ribbon, card.`,
+    `Released part structure for packaging levels (unit, shipper, pallet) including [[ifu]] and accessories; part of the [[mdf|medical device file]]. Changes follow change control because packaging affects protection, labeling and [[udi]].`,
+    `MC-PKG-9100: carton, 8 corner protectors, dust bag, IFU-T300, quick guide.`,
+    'kit ifu labeling udi-di');
+  T('labeling', 'Labeling', 'Regulation', `All labels and written information supplied with a device, including the IFU.`,
+    `Everything written that comes with the device: the stickers on it, the box print, and the manual.`,
+    `Food labelling: the front label, the ingredients panel and the leaflet.`,
+    `Regulated content (21 CFR 801; [[eumdr]] Annex I chapter III; symbols per ISO 15223-1). QMSR 820.45 requires controls ensuring label integrity and inspection of accuracy, including [[udi]], before release. Managed as artwork documents linked to label parts.`,
+    `The T-300 label set MC-LBL-9000 includes the rating label with UDI and the brake warning label.`,
+    'ifu udi packaging-bom');
+  T('doc', 'Declaration of conformity', 'Regulation', `The manufacturer's signed statement that the device meets the EU requirements.`,
+    `A signed document in which the maker takes responsibility: this product meets the law.`,
+    `Signing your tax return: you declare it is correct.`,
+    `EU declaration of conformity under [[eumdr]] Article 19 and Annex IV: manufacturer, Basic UDI-DI, device identification, class, standards applied, [[notified-body]] where involved, signature. Kept current with every significant change.`,
+    `DOC-DOC-0301 covers T-300M and T-300P, signed by Regulatory and Management.`,
+    'eumdr udi notified-body');
+  T('installed-base', 'Installed base', 'Service', `The record of every unit in the field: where it is and how it is configured.`,
+    `A register of all delivered stretchers: which hospital, which serial, which options, what has been repaired.`,
+    `A garage's customer file with every car it looks after.`,
+    `Equipment / installed-base records (SAP) per serial with as-built and as-maintained configuration, warranty dates and service history. Basis for field actions and for [[pms]].`,
+    `T3P-250118: St. Aldwyn General Hospital, powered, installed 2025-11-03, castor replaced 2026-05-06.`,
+    'field-service udi-pi fsca');
+
+  /* ---------------- Service and end of life ---------------- */
+  T('service-part', 'Service part', 'Service', `A part that may be replaced in the field and can be ordered as a spare.`,
+    `An item on the spare-parts list: the service engineer is allowed to replace it at the hospital.`,
+    `A replaceable bulb, as opposed to the wiring inside the wall.`,
+    `Part flagged as serviceable in the [[sbom]]; has service-level packaging, pricing and stock. Must be the same controlled revision as production or a qualified successor ([[supersession]]).`,
+    `Mattress MC-MAT-5000 is sold as a single service part.`,
+    'sbom spare-kit supersession');
+  T('spare-kit', 'Spare kit', 'Service', `A set of parts packaged together for one repair job.`,
+    `Everything needed for one repair in one bag: the part, its screws, the thread-lock.`,
+    `A bicycle puncture repair kit.`,
+    `[[kit]] in the Service view with its own number and BOM; ensures the complete, correct set is used and simplifies ordering.`,
+    `MC-KIT-6000 Castor service kit: castor, fixing screw, thread-lock capsule.`,
+    'kit service-part sbom');
+  T('service-bulletin', 'Service bulletin', 'Service', `A notice to the service organisation about an inspection, update or improved procedure.`,
+    `An official message to service engineers: check this, replace that, or do the job this new way.`,
+    `A manufacturer's notice to garages about a known issue.`,
+    `Controlled document with affected serial range, instructions, parts, time and tracking of completion per unit. If the action reduces a risk of serious harm, it is a [[fsca]] and follows recall rules.`,
+    `SB-T300-004: inspect and replace castors of lots NCW-L2510 and NCW-L2604.`,
+    'fsca field-service installed-base');
+  T('rma', 'RMA', 'Service', `Return Material Authorization: the number a customer needs before sending something back.`,
+    `Permission and a reference number for a return, so the factory knows what is arriving and why.`,
+    `A returns label from an online shop.`,
+    `Links the returned item to the customer, serial, complaint or service order; requires a decontamination declaration for used medical devices; routes the item to failure analysis, repair or scrap.`,
+    `RMA-2026-0077: returned castor from T3P-250118 for failure analysis.`,
+    'complaint warranty field-service');
+  T('field-service', 'Field service', 'Service', `Installation, maintenance and repair carried out at the customer's site.`,
+    `Engineers who travel to hospitals to install, check and repair the stretchers.`,
+    `A technician who comes to your home to fix the washing machine.`,
+    `Managed through service orders (SAP service) with planning, parts logistics, mobile reporting and confirmation. Service activities and records fall under [[iso13485]] 7.5.4 and are a [[pms]] data source.`,
+    `Service order SO-2026-0412: brake complaint on T3P-250118, castor replaced.`,
+    'installed-base service-bulletin complaint');
+  T('warranty', 'Warranty', 'Service', `The period in which the maker repairs defects free of charge.`,
+    `A promise: if it fails within this time through no fault of the user, we fix it at our cost.`,
+    `The guarantee card with a new appliance.`,
+    `Contractual entitlement tracked per serial from installation or delivery date. Warranty claims are quality data: each is screened as a possible [[complaint]].`,
+    `T-300: 24 months; battery pack 12 months.`,
+    'rma complaint installed-base');
+  T('refurbishment', 'Refurbishment', 'Service', `Restoring a used device to its original specification for further use.`,
+    `Taking a used stretcher back, replacing worn parts, testing it fully and returning it to service.`,
+    `A factory-reconditioned phone.`,
+    `Performed under a controlled procedure with defined inspections, replacement parts and final test; records added to the unit history. It must not change intended purpose or performance; otherwise it is a new device (EU MDR "fully refurbishing" rules apply to third parties) {V}.`,
+    `Process RF-T300: new castors and gas spring, full OP20 and OP70 tests, original serial kept.`,
+    'eol field-service dhr');
+  T('obsolescence', 'Obsolescence', 'Service', `A component is no longer made by its supplier.`,
+    `A bought part is being discontinued. The company must stock up, find a replacement or redesign.`,
+    `Your printer's ink cartridge being withdrawn from sale.`,
+    `Managed by monitoring supplier product change / end-of-life notices for [[manufacturer-part]]s; responses are [[ltb|last-time buy]], qualification of an alternate source, or redesign via [[change-request]].`,
+    `Notice PCN-2027-014: motor driver IC U3 on MC-PCB-8200 reaches end of production.`,
+    'ltb manufacturer-part aml eol');
+  T('ltb', 'Last-time buy', 'Service', `A final large purchase of a component before it is discontinued.`,
+    `Buying enough of a disappearing part to last until a replacement is ready, including spares.`,
+    `Stocking up on a favourite product before the shop stops selling it.`,
+    `Quantity = remaining production + service demand over the support period + margin; storage conditions and shelf life must be considered. Recorded with the [[obsolescence]] case.`,
+    `1 800 pieces of the motor driver IC bought to cover production and 7 years of service.`,
+    'obsolescence eol');
+  T('eol', 'End of life', 'Service', `The planned retirement of a product: end of sale, end of service, disposal.`,
+    `The last chapter: the model stops being sold, spares are supplied for a promised time, and old units are disposed of responsibly.`,
+    `A car model going out of production while garages still service it for years.`,
+    `Planned milestones: last order date, end of production, end of service and spare-part supply, record retention (at least the device lifetime; EU MDR: 10 years after last device placed on market), disposal instructions (WEEE, batteries). Parts move to state Obsolete.`,
+    `T-300 plan: spares for 7 years after last sale; battery take-back described in the IFU.`,
+    'obsolescence supersession lifecycle-state');
+  T('supersession', 'Supersession', 'BOM', `The record that one part or revision replaces another.`,
+    `A note saying "use this instead of that from now on", so nobody orders or fits the old one.`,
+    `A new edition of a textbook replacing the old one on the reading list.`,
+    `Replacement relationship used in service and logistics: superseding and superseded part, interchangeability direction, and disposition of old stock. Works together with [[effectivity]] (when production switches).`,
+    `Castor MC-CST-6000 A is superseded by B; A must no longer be supplied as a spare.`,
+    'effectivity service-part revision');
+
+  /* ---------------- Post-market and reporting ---------------- */
+  T('pms', 'Post-market surveillance', 'Quality', `Systematically watching how the device performs after it is sold.`,
+    `The company keeps collecting and studying information about its product in real use, to spot problems early.`,
+    `A restaurant reading every review and tracking every returned dish.`,
+    `[[eumdr]] Articles 83–86 (PMS plan and report / PSUR depending on class); [[iso13485]] 8.2.1 feedback; [[iso14971]] clause 10 production and post-production information. Inputs: complaints, service data, NCs, literature, similar devices.`,
+    `The T-300 PMS report trends brake-related complaints per 1 000 units per quarter.`,
+    'complaint capa vigilance risk-file');
+  T('emdr', 'eMDR', 'Regulation', `Electronic Medical Device Reporting: sending serious-event reports to FDA.`,
+    `If a device may have caused or contributed to a death or serious injury, or malfunctioned in a way that could, the maker must tell FDA electronically within a set time.`,
+    `A duty to report a serious accident to the authorities, not just fix the car.`,
+    `21 CFR 803: manufacturer reports within 30 calendar days of becoming aware; 5 work days for events requiring remedial action to prevent unreasonable risk. Submitted electronically (Form 3500A data) through FDA's gateway. Each [[complaint]] needs a documented reportability decision.`,
+    `CMP-2026-0231: no injury; malfunction assessed as not likely to cause serious injury if it recurred, given the brake indicator: decision "not reportable", signed.`,
+    'complaint vigilance fda fsca');
+  T('vigilance', 'Vigilance', 'Regulation', `The EU system for reporting serious incidents and field safety actions.`,
+    `In Europe, serious incidents with a device must be reported to the national authority within fixed deadlines.`,
+    `The European counterpart of the accident report.`,
+    `[[eumdr]] Articles 87–92: serious incidents reported no later than 15 days after awareness (10 days for death or unanticipated serious deterioration in health; 2 days for a serious public health threat); [[fsca]]s reported before being undertaken; trend reporting (Art. 88). Reports go through [[eudamed]] as its vigilance module becomes mandatory {V}.`,
+    `The brake complaint was assessed against the "serious incident" definition and judged not reportable; the trend is monitored.`,
+    'emdr fsca eumdr complaint');
+  T('fsca', 'FSCA / Recall', 'Regulation', `Field Safety Corrective Action: an action on devices already in the field to reduce a safety risk.`,
+    `When a safety problem affects devices already delivered, the maker must act on them: inspect, repair, replace or take them back, and inform users.`,
+    `A car recall letter: bring it in, we fix it free.`,
+    `EU: FSCA with field safety notice, reported to authorities ([[eumdr]] Art. 89). US: correction or removal under 21 CFR 806; FDA classifies recalls (Class I–III) under Part 7. Requires affected-unit identification via [[traceability]], completion tracking and effectiveness checks.`,
+    `For the brake issue the risk assessment concluded a [[service-bulletin]] was sufficient; an FSCA would have been required had injuries been likely.`,
+    'service-bulletin vigilance emdr installed-base');
+  T('material-compliance', 'Material compliance', 'Risk', `Knowing and proving which regulated substances are in the product.`,
+    `Keeping track of what the product is chemically made of, so banned or declarable substances are controlled.`,
+    `Keeping the ingredient and allergen list for everything you sell.`,
+    `Collection of supplier declarations per [[manufacturer-part]] ([[rohs]], [[reach]], conflict minerals, PFAS, battery rules) and roll-up across the BOM; PTC offers a product-compliance capability for this {V}. [[biocompatibility]] is handled separately under ISO 10993.`,
+    `The T-300P roll-up: RoHS compliant with exemptions listed for the PCBA; REACH: no SVHC above 0.1 %.`,
+    'rohs reach biocompatibility manufacturer-part');
 })();
