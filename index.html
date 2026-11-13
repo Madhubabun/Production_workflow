@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stretcher Lifecycle Explorer — Coming Soon</title>
+<style>
+  :root { --bg:#0b1f2a; --card:#11303f; --accent:#2ec4b6; --text:#e8f4f8; --muted:#9bbcc9; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:linear-gradient(135deg,#0b1f2a,#0f3446); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { background:var(--card); border:1px solid rgba(46,196,182,.25); border-radius:16px; padding:40px; max-width:720px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+  .badge { display:inline-block; background:rgba(46,196,182,.15); color:var(--accent); font-size:13px; font-weight:600; padding:6px 12px; border-radius:999px; margin-bottom:18px; letter-spacing:.5px; }
+  h1 { font-size:30px; line-height:1.25; margin-bottom:12px; }
+  p { color:var(--muted); line-height:1.6; margin-bottom:24px; }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .step { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); padding:8px 12px; border-radius:8px; font-size:13px; opacity:0; animation:fade .5s forwards; }
+  .arrow { color:var(--accent); opacity:0; animation:fade .5s forwards; }
+  @keyframes fade { to { opacity:1; } }
+  footer { margin-top:28px; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <main class="card">
+    <span class="badge">COMING SOON</span>
+    <h1>Stretcher Lifecycle Explorer</h1>
+    <p>An interactive guide to how a medical device stretcher moves from an idea to a 3D CAD model, through Windchill PLM and QMS, into the plant, and on to suppliers, the market and service. The full interactive site is being built.</p>
+    <div class="flow" id="flow"></div>
+    <footer>MediCare Devices Ltd (fictional) · All data on this site is illustrative.</footer>
+  </main>
+<script>
+  const steps = ["Idea","3D CAD","EBOM","Release","MBOM","SAP","Production","Packaging & UDI","Service","Feedback"];
+  const flow = document.getElementById("flow");
+  steps.forEach((s, i) => {
+    if (i) { const a = document.createElement("span"); a.className = "arrow"; a.textContent = "→"; a.style.animationDelay = (i * 0.15 - 0.07) + "s"; flow.appendChild(a); }
+    const d = document.createElement("span"); d.className = "step"; d.textContent = s; d.style.animationDelay = (i * 0.15) + "s"; flow.appendChild(d);
+  });
+</script>
+</body>
+</html>
