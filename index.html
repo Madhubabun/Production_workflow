@@ -1,39 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stretcher Lifecycle Explorer — Coming Soon</title>
-<style>
-  :root { --bg:#0b1f2a; --card:#11303f; --accent:#2ec4b6; --text:#e8f4f8; --muted:#9bbcc9; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:linear-gradient(135deg,#0b1f2a,#0f3446); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-  .card { background:var(--card); border:1px solid rgba(46,196,182,.25); border-radius:16px; padding:40px; max-width:720px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,.35); }
-  .badge { display:inline-block; background:rgba(46,196,182,.15); color:var(--accent); font-size:13px; font-weight:600; padding:6px 12px; border-radius:999px; margin-bottom:18px; letter-spacing:.5px; }
-  h1 { font-size:30px; line-height:1.25; margin-bottom:12px; }
-  p { color:var(--muted); line-height:1.6; margin-bottom:24px; }
-  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  .step { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); padding:8px 12px; border-radius:8px; font-size:13px; opacity:0; animation:fade .5s forwards; }
-  .arrow { color:var(--accent); opacity:0; animation:fade .5s forwards; }
-  @keyframes fade { to { opacity:1; } }
-  footer { margin-top:28px; font-size:12px; color:var(--muted); }
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--HEAD-START-->
+<title>Stretcher Lifecycle Journey</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interactive learning site: how a hospital stretcher travels from idea to CAD, Windchill, SAP, production, market, service and CAPA. All data invented.">
+<link rel="stylesheet" href="styles.css">
+<!--HEAD-END-->
 </head>
 <body>
-  <main class="card">
-    <span class="badge">COMING SOON</span>
-    <h1>Stretcher Lifecycle Explorer</h1>
-    <p>An interactive guide to how a medical device stretcher moves from an idea to a 3D CAD model, through Windchill PLM and QMS, into the plant, and on to suppliers, the market and service. The full interactive site is being built.</p>
-    <div class="flow" id="flow"></div>
-    <footer>MediCare Devices Ltd (fictional) · All data on this site is illustrative.</footer>
-  </main>
-<script>
-  const steps = ["Idea","3D CAD","EBOM","Release","MBOM","SAP","Production","Packaging & UDI","Service","Feedback"];
-  const flow = document.getElementById("flow");
-  steps.forEach((s, i) => {
-    if (i) { const a = document.createElement("span"); a.className = "arrow"; a.textContent = "→"; a.style.animationDelay = (i * 0.15 - 0.07) + "s"; flow.appendChild(a); }
-    const d = document.createElement("span"); d.className = "step"; d.textContent = s; d.style.animationDelay = (i * 0.15) + "s"; flow.appendChild(d);
-  });
-</script>
+<!--BODY-START-->
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#home" aria-label="Stretcher Lifecycle Journey, home">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><defs><linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b3df0"/><stop offset="1" stop-color="#e0409a"/></linearGradient></defs><rect x="1" y="1" width="30" height="30" rx="8" fill="#5b3df0"/><path d="M6 17h17l3-5M8 17v5m13-5v5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="8" cy="24" r="2" fill="#fff"/><circle cx="21" cy="24" r="2" fill="#fff"/></svg>
+      <span class="brand-t"><b>Stretcher Lifecycle Journey</b><small>MediCare Devices Ltd · training · invented data</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" data-nav="home">Journey</a>
+      <a href="#parts" data-nav="parts">Parts &amp; BOM</a>
+      <a href="#glossary" data-nav="glossary">Glossary</a>
+    </nav>
+    <div class="tools">
+      <label class="search"><span class="sr">Search terms</span>
+        <input id="q" type="search" placeholder="Search a term, e.g. UDI" autocomplete="off">
+      </label>
+      <div class="seg" role="group" aria-label="Depth of explanations">
+        <button type="button" id="lvSimple" data-level="simple" aria-pressed="true" data-tip="Plain language for everyone">Simple</button>
+        <button type="button" id="lvExpert" data-level="expert" aria-pressed="false" data-tip="Windchill objects, clauses and audit detail">Expert</button>
+      </div>
+      <button type="button" class="iconbtn" id="themeBtn" aria-label="Switch light / dark mode" data-tip="Light / dark mode">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HOME: welcome, journey map, 3D stretcher, data flow -->
+  <section id="home" class="wrap">
+    <div id="welcome" class="welcome"></div>
+
+    <section class="card" aria-labelledby="mapH">
+      <div class="card-h">
+        <h2 id="mapH">The journey in 10 stages</h2>
+        <p class="hint">Select a stage. The stretcher, the data flow and the panel below follow it.</p>
+      </div>
+      <div class="map-scroll" tabindex="0" aria-label="Journey map, scroll sideways on small screens"><div id="map" class="map"></div></div>
+    </section>
+
+    <div class="two">
+      <section class="card viewer-card" aria-labelledby="v3dH">
+        <div class="card-h">
+          <h2 id="v3dH">The stretcher at this stage</h2>
+          <p class="hint">Drag to rotate · scroll to zoom · hover a part · click it for details</p>
+        </div>
+        <div class="viewer">
+          <div id="stage3d" class="stage3d" aria-label="3D model of the TransPort T-300 stretcher" role="img"></div>
+          <div id="modeBadge" class="mode-badge"></div>
+          <div class="zoom">
+            <button type="button" class="iconbtn" id="zIn" aria-label="Zoom in">+</button>
+            <button type="button" class="iconbtn" id="zOut" aria-label="Zoom out">−</button>
+            <button type="button" class="iconbtn" id="zReset" aria-label="Reset view" data-tip="Reset view">⟲</button>
+          </div>
+        </div>
+        <div class="vctl">
+          <div class="vrow">
+            <span class="lbl" id="modesL">Lifecycle look</span>
+            <div id="modes" class="chips" role="group" aria-labelledby="modesL"></div>
+          </div>
+          <div class="vrow">
+            <label class="lbl" for="explode">Explode view</label>
+            <input id="explode" type="range" min="0" max="100" value="0">
+            <label class="check"><input id="powered" type="checkbox" checked> Powered drive option</label>
+          </div>
+          <div class="vrow">
+            <span class="lbl" id="partsL">Parts</span>
+            <div id="partChips" class="chips small" role="group" aria-labelledby="partsL"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="stagePanel" aria-live="polite"></section>
+    </div>
+
+    <section class="card" aria-labelledby="pkH">
+      <div class="card-h">
+        <h2 id="pkH">What moves between the systems</h2>
+        <p class="hint" id="pkHint"></p>
+      </div>
+      <div class="map-scroll"><div id="packets" class="packets"></div></div>
+      <ul id="pkList" class="pk-list"></ul>
+    </section>
+
+    <section class="roadmap" aria-labelledby="rmH">
+      <h2 id="rmH">What this site covers</h2>
+      <div class="rm-grid">
+        <div><h3>Available now</h3><p>Journey map with parallel lanes, 3D stretcher with lifecycle looks and explode view, hover tips and detail drawers for every term and part, full pages for stages 1–4, parts list, searchable glossary.</p></div>
+        <div><h3>Next: Phase 2</h3><p>Full pages for stages 5–10, procurement and service animations, and "follow a part" through its complete digital thread.</p></div>
+        <div><h3>Then: Phase 3</h3><p>The brake complaint → CAPA story, role views with RACI, the QMS module map, 150+ glossary terms and the guided "Play the journey" tour.</p></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- Other routes render here: stage pages, parts, glossary -->
+  <section id="page" class="wrap" hidden></section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><b>Training material.</b> Every company, person, supplier, part number, record and UDI value on this site is invented. Items marked <span class="verify">VERIFY</span> depend on your Windchill or SAP release, licences or configuration: check them before relying on them.</p>
+  </div>
+</footer>
+
+<!-- Slide-in detail drawer -->
+<div id="scrim" class="scrim" hidden></div>
+<aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden>
+  <header class="d-head">
+    <div>
+      <div id="dKicker" class="kicker"></div>
+      <h2 id="dTitle"></h2>
+      <p id="dSub" class="d-sub"></p>
+    </div>
+    <button type="button" class="iconbtn" id="dClose" aria-label="Close details">✕</button>
+  </header>
+  <div id="dTabs" class="d-tabs" role="tablist"></div>
+  <div id="dBody" class="d-body"></div>
+</aside>
+
+<div id="tip" class="tip" role="tooltip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="data.js"></script>
+<script src="data-terms.js"></script>
+<script src="stretcher3d.js"></script>
+<script src="app.js"></script>
+<!--BODY-END-->
 </body>
 </html>
