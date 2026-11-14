@@ -495,3 +495,9 @@ h3.sub { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; co
 .bom-tree .lv1 { margin-left: 18px; } .bom-tree .lv2 { margin-left: 36px; }
 .bom-tree .t-new { background: var(--warn-bg); border-left-color: var(--warn); }
 .bom-tree .t-group { background: color-mix(in srgb, var(--c) 16%, var(--surface)); font-weight: 600; }
+
+
+/* ================= Phase 5: product switch ================= */
+.prod-switch { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.prod-switch .lbl { min-width: 0; }
+.prod-home { display: flex; flex-direction: column; gap: 6px; }

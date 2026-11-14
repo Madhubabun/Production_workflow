@@ -13,10 +13,15 @@
     get: function (k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
     set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
   };
-  var state = { level: store.get('md-level', 'simple'), stage: 1, route: 'home', gq: '', role: store.get('md-role', ''), capaStep: 0, mf: 'All', mq: '' };
+  var state = { level: store.get('md-level', 'simple'), stage: 1, route: 'home', gq: '', role: store.get('md-role', ''), capaStep: 0, mf: 'All', mq: '', product: store.get('md-product', 'stretcher') === 'bike' ? 'bike' : 'stretcher' };
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var partById = {}; MD.parts.forEach(function (p) { partById[p.id] = p; });
   var roleById = {}; MD.roles.forEach(function (r) { roleById[r.id] = r; });
+  var bikeById = {}; MD.bike.parts.forEach(function (p) { bikeById[p.id] = p; });
+  function anyPart(id) { return partById[id] || bikeById[id] || { id: id, name: id, s: '' }; }
+  function isBike() { return state.product === 'bike'; }
+  function prodParts() { return isBike() ? MD.bike.parts : MD.parts.filter(function (p) { return p.lvl > 0; }); }
+  function curStory() { return isBike() ? MD.bike.story : MD.story; }
 
   /* ---------------- helpers ---------------- */
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -69,17 +74,17 @@
   function snapFig(ids, o) {
     ids = ids || []; o = o || {};
     var cap = o.cap ? esc(o.cap) : (ids.length
-      ? 'Highlighted: ' + ids.map(function (id) { return '<button type="button" class="term plink" data-part="' + id + '" data-tip="' + esc(partById[id].name) + '">' + esc(partById[id].name) + '</button>'; }).join(', ')
+      ? 'Highlighted: ' + ids.map(function (id) { return '<button type="button" class="term plink" data-part="' + id + '" data-tip="' + esc(anyPart(id).name) + '">' + esc(anyPart(id).name) + '</button>'; }).join(', ')
       : 'The whole ' + esc(MD.product.name) + ' stretcher');
-    return '<figure class="pfig" data-snap="' + ids.join(',') + '" data-look="' + (o.look || '') + '" data-ex="' + (o.ex || 0) + '"><img alt="" hidden><figcaption>' + cap + '</figcaption></figure>';
+    return '<figure class="pfig" data-snap="' + ids.join(',') + '" data-look="' + (o.look || '') + '" data-ex="' + (o.ex || 0) + '" data-prod="' + (o.prod || 'stretcher') + '"><img alt="" hidden><figcaption>' + cap + '</figcaption></figure>';
   }
   function hydrateSnaps(root) {
     $$('.pfig[data-snap]', root).forEach(function (f) {
       var ids = f.getAttribute('data-snap'), img = $('img', f);
-      var url = window.Stretcher3D && window.Stretcher3D.snapshot ? window.Stretcher3D.snapshot(ids ? ids.split(',') : [], 0, 0, f.getAttribute('data-look') || '', +f.getAttribute('data-ex') || 0) : null;
+      var url = window.Stretcher3D && window.Stretcher3D.snapshot ? window.Stretcher3D.snapshot(ids ? ids.split(',') : [], 0, 0, f.getAttribute('data-look') || '', +f.getAttribute('data-ex') || 0, f.getAttribute('data-prod') || 'stretcher') : null;
       if (!url) { f.hidden = true; return; }
       img.src = url; img.hidden = false;
-      img.alt = '3D picture of the stretcher' + (ids ? ' with these parts in colour: ' + ids.split(',').map(function (id) { return partById[id].name; }).join(', ') : '');
+      img.alt = '3D picture of the stretcher' + (ids ? ' with these parts in colour: ' + ids.split(',').map(function (id) { return anyPart(id).name; }).join(', ') : '');
     });
   }
 
@@ -195,6 +200,7 @@
     return '<span class="pill ' + cls + '">' + esc(c) + '</span>';
   }
   function openPart(id) {
+    if (bikeById[id]) { openBikePart(id); return; }
     var p = partById[id]; if (!p) return;
     var parent = null, idx = MD.parts.indexOf(p);
     for (var i = idx - 1; i >= 0; i--) { if (MD.parts[i].lvl < p.lvl) { parent = MD.parts[i]; break; } }
@@ -359,14 +365,14 @@
     $('#modes').innerHTML = MD.modes.map(function (m) {
       return '<button type="button" class="chip" data-mode="' + m.id + '" aria-pressed="false" data-tip="' + esc(m.tip) + '">' + esc(m.name) + '</button>';
     }).join('');
-    $('#partChips').innerHTML = MD.parts.filter(function (p) { return p.lvl > 0; }).map(function (p) {
+    $('#partChips').innerHTML = prodParts().map(function (p) {
       return '<button type="button" class="chip' + (p.opt ? ' opt' : '') + '" data-part="' + p.id + '" data-hl="' + p.id + '" data-tip="' + esc(p.id + ' — ' + p.s) + '">' + esc(p.name) + '</button>';
     }).join('');
   }
   function setMode(id) {
     var m = MD.modes.filter(function (x) { return x.id === id; })[0]; if (!m) return;
     $$('#modes .chip').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mode') === id ? 'true' : 'false'); });
-    $('#modeBadge').textContent = m.name + ' · ' + m.tip;
+    $('#modeBadge').textContent = modeText(m);
     if (window.Stretcher3D) window.Stretcher3D.setMode(id);
   }
   function selectStage(n, scroll) {
@@ -801,19 +807,69 @@
   }
   function hush() { voice.tok++; if (voice.ok) { try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } } }
 
+  /* ---------------- PRODUCT SWITCH: stretcher or bicycle (Phase 5) ---------------- */
+  function prodSwitchHtml() {
+    return '<div class="prod-switch"><span class="lbl">Study with</span><div class="seg" role="group" aria-label="Product to study">' +
+      '<button type="button" data-product="stretcher" aria-pressed="' + !isBike() + '">Stretcher</button>' +
+      '<button type="button" data-product="bike" aria-pressed="' + isBike() + '">Bicycle</button></div></div>';
+  }
+  function modeText(m) {
+    if (isBike() && m.id === 'hospital') return 'On the road · In daily use.';
+    if (isBike() && m.id === 'service') return 'Workshop · Back for a repair.';
+    return m.name + ' · ' + m.tip;
+  }
+  function renderProdHome() {
+    var box = $('#prodHome'); if (!box) return;
+    box.innerHTML = prodSwitchHtml() + (isBike() ? '<p class="tnote">You are looking at the bicycle, a simpler product. The looks work the same way; the 10 stages and their records still tell the stretcher\'s story.</p>' : '');
+    $('#v3dH').textContent = isBike() ? 'The bicycle at this stage' : 'The stretcher at this stage';
+    var chk = $('#powered'); if (chk) chk.closest('label').hidden = isBike();
+  }
+  function setProduct(p) {
+    state.product = p === 'bike' ? 'bike' : 'stretcher'; store.set('md-product', state.product);
+    if (window.Stretcher3D && window.Stretcher3D.setProduct) window.Stretcher3D.setProduct(state.product);
+    renderViewerControls(); renderProdHome(); story.i = 0;
+    var y = window.scrollY; route(); window.scrollTo(0, y);
+  }
+  function curBoms() {
+    if (!isBike()) { return { intro: MD.boms.intro, order: MD.boms.order, compare: MD.boms.compare, castor: MD.boms.castor, followIds: ['MC-CST-6000'] }; }
+    var b = MD.bike.boms; return { intro: b.intro, order: MD.boms.order, compare: b.compare, castor: b.follow, followIds: b.followIds };
+  }
+  // one BOM description; the bicycle only overrides what differs from the stretcher
+  function bomOf(id) {
+    var base = MD.boms.list[id]; if (!isBike()) return base;
+    var o = {}, k, over = MD.bike.boms.list[id] || {};
+    for (k in base) o[k] = base[k];
+    for (k in over) o[k] = over[k];
+    return o;
+  }
+  function openBikePart(id) {
+    var p = bikeById[id], where = [];
+    ['ebom', 'mbom', 'sbom', 'pbom'].forEach(function (b) {
+      var rows = (MD.bike.boms.list[b] || {}).tree || [];
+      rows.forEach(function (r, i) { if (r[1] === id) { var par = ''; for (var k = i - 1; k >= 0; k--) { if (rows[k][0] < r[0]) { par = rows[k][2]; break; } } where.push([MD.boms.list[b].name, r[2], par]); } });
+    });
+    openDrawer({ kicker: 'Bicycle part · ' + id, title: p.name, sub: '<span class="pill">' + esc(p.mb) + '</span> <span class="pill ok">Quantity ' + p.qty + '</span>',
+      tabs: [
+        { label: 'Simple', html: '<p>' + esc(p.s) + '</p>' + snapFig([id], { prod: 'bike' }) + '<p class="tnote">The bicycle is a practice product: invented, and much simpler than the stretcher.</p>' },
+        { label: 'In the lists', html: '<p>The same part appears in several parts lists, each arranged for a different job.</p><div class="table-scroll"><table><thead><tr><th>List</th><th>Shown as</th><th>Sits under</th></tr></thead><tbody>' +
+          where.map(function (w) { return '<tr><td>' + esc(w[0]) + '</td><td>' + esc(w[1]) + '</td><td>' + esc(w[2] || '—') + '</td></tr>'; }).join('') + '</tbody></table></div><p><a class="btn ghost" href="#boms" data-close="1">See how each list is made</a></p>' }
+      ] });
+    if (window.Stretcher3D) window.Stretcher3D.select(id);
+  }
+
   /* ---------------- STORY MODE ---------------- */
   var story = { i: 0, read: false };
   function renderStoryPage() {
     return crumbs([['Journey', '#home'], ['Story']]) +
-      '<header class="page-head" style="--c:var(--s1)"><div class="kicker">Story mode · no jargon</div><h1>The life of ' + esc(MD.story.name) + ' the stretcher</h1>' +
-      '<p class="tag">Ten pages, one picture each. Read it yourself or let it be read to you. No technical words needed.</p></header>' +
+      '<header class="page-head" style="--c:var(--s1)"><div class="kicker">Story mode · no jargon</div><h1>The life of ' + esc(curStory().name) + (isBike() ? ' the bicycle' : ' the stretcher') + '</h1>' +
+      '<p class="tag">Ten pages, one picture each. Read it yourself or let it be read to you. No technical words needed.</p>' + prodSwitchHtml() + '</header>' +
       '<section class="sec story" id="storyBox" aria-live="polite"></section>';
   }
   function fillStory() {
-    var P = MD.story.pages; story.i = Math.max(0, Math.min(P.length - 1, story.i));
+    var P = curStory().pages; story.i = Math.max(0, Math.min(P.length - 1, story.i));
     var p = P[story.i], s = MD.stages[p.st - 1], i = story.i;
     $('#storyBox').innerHTML = '<div class="story-grid" style="--c:var(--s' + p.st + ')">' +
-      snapFig([], { look: p.look, cap: MD.story.name + ' on page ' + (i + 1) }) +
+      snapFig([], { look: p.look, prod: state.product, cap: curStory().name + ' on page ' + (i + 1) }) +
       '<div class="story-text"><div class="kicker">Page ' + (i + 1) + ' of ' + P.length + '</div><h2>' + esc(p.h) + '</h2><p class="story-p">' + esc(p.t) + '</p>' +
       kitchenNote(MD.kitchen.stages[p.st - 1]) +
       '<p class="tnote">Professionals call this <a href="#stage-' + s.n + '">stage ' + s.n + ' · ' + esc(s.name) + '</a>.</p>' +
@@ -825,7 +881,7 @@
     if (story.read) storySpeak(); else hush();
   }
   function storySpeak() {
-    var P = MD.story.pages, p = P[story.i], t0 = performance.now();
+    var P = curStory().pages, p = P[story.i], t0 = performance.now();
     var ok = say(p.h + '. ' + p.t, 1, function () {
       if (performance.now() - t0 < 1000 || !story.read || state.route !== 'story') return;
       if (story.i < P.length - 1) setTimeout(function () { if (story.read && state.route === 'story') { story.i++; fillStory(); } }, 700);
@@ -856,24 +912,24 @@
     }).join('') + '</ul>';
   }
   function renderBomsPage() {
-    var B = MD.boms, box = function (id, extra) { var b = B.list[id]; return '<button type="button" class="bf" data-scroll="bom-' + id + '" style="--c:var(--s' + b.c + ')"><b>' + esc(b.name) + '</b><small>' + esc(b.q) + '</small>' + (extra || '') + '</button>'; };
+    var B = curBoms(), box = function (id, extra) { var b = bomOf(id); return '<button type="button" class="bf" data-scroll="bom-' + id + '" style="--c:var(--s' + b.c + ')"><b>' + esc(b.name) + '</b><small>' + esc(b.q) + '</small>' + (extra || '') + '</button>'; };
     var h = crumbs([['Journey', '#home'], ['How BOMs are made']]) +
-      '<header class="page-head" style="--c:var(--s3)"><div class="kicker">Parts lists explained</div><h1>How each BOM is made</h1><p class="tag">' + esc(B.intro) + '</p></header>';
+      '<header class="page-head" style="--c:var(--s3)"><div class="kicker">Parts lists explained</div><h1>How each BOM is made</h1><p class="tag">' + esc(B.intro) + '</p>' + prodSwitchHtml() + '</header>';
     h += '<section class="sec"><h2>One set of parts, several lists</h2><div class="bom-flow"><span class="bf plain" style="--c:var(--s2)"><b>3D model</b><small>Built in Creo</small></span><i>→</i>' + box('ebom') + '<i>→</i>' + box('mbom') + '<i>→</i>' + box('sapbom') + '</div>' +
       '<div class="bom-flow"><span class="bf-note">The EBOM also feeds</span><i>→</i>' + box('sbom') + '<span class="bf-note">and the packaging list goes into the MBOM</span><i>←</i>' + box('pbom') + '</div>' +
       '<p class="tnote">Select a box to jump to it.</p></section>';
     B.order.forEach(function (id) {
-      var b = B.list[id];
+      var b = bomOf(id);
       h += '<section class="sec bom-sec" id="bom-' + id + '" style="--c:var(--s' + b.c + ')"><div class="bom-head"><div><div class="kicker">' + esc(b.q) + '</div><h2 style="font-size:1.35rem">' + rich('[[' + b.term + '|' + b.name + ']]') + '</h2></div><a class="chip" href="#stage-' + b.st + '">Stage ' + b.st + ' · ' + esc(MD.stages[b.st - 1].short) + '</a></div>' +
         '<p class="prose">' + esc(b.plain) + '</p>' + kitchenNote(b.kitchen) +
-        (b.pics && b.pics.length ? '<div class="bom-pics">' + b.pics.map(function (p) { return snapFig(p.ids || [], { look: p.look, ex: p.ex, cap: p.cap }); }).join('') + '</div>' : '') +
+        (b.pics && b.pics.length ? '<div class="bom-pics">' + b.pics.map(function (p) { return snapFig(p.ids || [], { look: p.look, ex: p.ex, cap: p.cap, prod: state.product }); }).join('') + '</div>' : '') +
         '<div class="cols2"><div><h3 class="sub">How it is made</h3><ol class="bul">' + b.how.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' +
         '<dl class="kv" style="margin-top:12px"><dt>Made by</dt><dd>' + esc(b.who) + '</dd><dt>Made from</dt><dd>' + esc(b.from) + '</dd><dt>Lives in</dt><dd>' + esc(b.sys) + '</dd></dl></div>' +
         '<div><h3 class="sub">What it looks like</h3>' + bomTree(b.tree) + '</div></div></section>';
     });
     h += '<section class="sec"><h2>Side by side</h2><div class="table-scroll"><table><thead><tr><th></th><th>Engineering BOM</th><th>Manufacturing BOM</th><th>Service BOM</th></tr></thead><tbody>' +
       B.compare.map(function (r) { return '<tr><td><b>' + esc(r[0]) + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
-      '<div class="cols2"><div>' + snapFig(['MC-CST-6000']) + '</div><p class="notice">' + rich(B.castor.replace('MC-CST-6000', '[[p:MC-CST-6000]]')) + '</p></div></section>';
+      '<div class="cols2"><div>' + snapFig(B.followIds, { prod: state.product }) + '</div><p class="notice">' + rich(B.castor.replace('MC-CST-6000', '[[p:MC-CST-6000]]')) + '</p></div></section>';
     return h;
   }
 
@@ -940,6 +996,7 @@
       return;
     }
     if ((el = t.closest('[data-trace-replay]'))) { playTrace(); return; }
+    if ((el = t.closest('[data-product]'))) { setProduct(el.getAttribute('data-product')); return; }
     if ((el = t.closest('[data-play]'))) { tourOpen(); return; }
     if ((el = t.closest('[data-story-step]'))) { story.i = +el.getAttribute('data-story-step'); fillStory(); return; }
     if ((el = t.closest('[data-story-read]'))) { story.read = !story.read; if (story.read) { voice.on = true; store.set('md-voice', '1'); } fillStory(); return; }
@@ -1002,7 +1059,7 @@
       theme: currentTheme(), reduced: reduced,
       onHover: function (id, x, y) {
         if (!id) { hideTip(); return; }
-        var p = partById[id]; if (p) showTip(p.name + ' · ' + p.id + ' — click for details', x, y - 6);
+        var p = anyPart(id); if (p) showTip(p.name + ' · ' + p.id + ' — click for details', x, y - 6);
       },
       onPick: function (id) { openPart(id); }
     });
@@ -1014,6 +1071,8 @@
   $('#roleSel').innerHTML = '<option value="">Everyone</option>' + MD.roles.map(function (r) { return '<option value="' + r.id + '"' + (r.id === state.role ? ' selected' : '') + '>' + esc(r.name) + '</option>'; }).join('');
   $('#tJump').innerHTML = MD.stages.map(function (s) { return '<option value="' + s.n + '">' + s.n + ' · ' + esc(s.short) + '</option>'; }).join('');
   ['tPrev', 'tNext', 'tPlay', 'tClose'].forEach(function (id) { $('#' + id).addEventListener('click', function () { if (id === 'tPrev') tourGo(tour.i - 1); else if (id === 'tNext') tourGo(tour.i + 1); else if (id === 'tPlay') tourPlay(!tour.playing); else tourClose(); }); });
+  if (isBike() && window.Stretcher3D && window.Stretcher3D.setProduct) { window.Stretcher3D.setProduct('bike'); renderViewerControls(); }
+  renderProdHome();
   renderWelcome();
   route();
   pk.raf = requestAnimationFrame(tickPackets);

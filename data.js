@@ -1344,6 +1344,71 @@ window.MD = {
     castor: 'Follow one part: the castor MC-CST-6000 appears in all three. In the EBOM it sits directly under the stretcher (quantity 4). In the MBOM it sits under "Chassis complete" because that is where it is fitted. In the SBOM it sits inside the castor service kit (quantity 1) with its screw and thread-lock.'
   },
 
+  /* ---------------------------------------------------------------------
+     BICYCLE (Phase 5): a second, simpler product for the 3D viewer, the
+     story and the "How BOMs are made" page. The regulated journey stays
+     with the stretcher. Missing BOM fields fall back to MD.boms.
+     --------------------------------------------------------------------- */
+  bike: {
+    name: 'CityRide B-200', maker: 'MediCare Cycles (invented)',
+    parts: [
+      { id: 'BK-FRM-100', name: 'Frame', qty: 1, mb: 'Make', s: 'The backbone of the bicycle. Everything else bolts onto it.' },
+      { id: 'BK-FRK-200', name: 'Fork', qty: 1, mb: 'Buy', s: 'Holds the front wheel and turns with the handlebar.' },
+      { id: 'BK-WHL-300', name: 'Wheel', qty: 2, mb: 'Make', s: 'Rim, hub and spokes, built and trued in the factory.' },
+      { id: 'BK-TYR-310', name: 'Tyre and tube', qty: 2, mb: 'Buy', s: 'The rubber that touches the road. Wears out and is replaced.' },
+      { id: 'BK-BRK-400', name: 'Brake set', qty: 1, mb: 'Buy', s: 'Front and rear brakes with levers and cables. The most safety-critical part.' },
+      { id: 'BK-DRV-500', name: 'Drivetrain', qty: 1, mb: 'Buy', s: 'Crank, chainring, chain and sprocket: they turn pedalling into movement.' },
+      { id: 'BK-PDL-510', name: 'Pedal', qty: 2, mb: 'Buy', s: 'Where your feet push. Shipped loose in the box and fitted by the shop.' },
+      { id: 'BK-HBR-600', name: 'Handlebar and stem', qty: 1, mb: 'Buy', s: 'For steering, and it carries the brake levers.' },
+      { id: 'BK-SDL-700', name: 'Saddle and seat post', qty: 1, mb: 'Buy', s: 'Where you sit. Height is adjustable.' },
+      { id: 'BK-LGT-800', name: 'Light set', qty: 1, mb: 'Buy', s: 'Front and rear lights so you are seen in the dark.' }
+    ],
+    story: { name: 'Billy', pages: [
+      { st: 1, look: 'idea', h: 'Billy is only an idea', t: 'This is Billy. For now he is just a sketch. People who cycle to work say what they need: light to carry, strong brakes, comfortable for an hour. The makers also list what could go wrong, such as a brake that fails in the rain.' },
+      { st: 2, look: 'creo', h: 'Billy is drawn in 3D', t: 'Engineers build Billy on a computer, piece by piece: frame, wheels, brakes, chain. Every time they save, the older version is kept as well.' },
+      { st: 3, look: 'windchill', h: 'Every piece gets a name tag', t: 'Each piece of Billy gets its own number and goes onto one official list. Now everyone knows exactly what he is made of.' },
+      { st: 4, look: 'released', h: 'Billy passes his exams', t: 'Billy is tested: a heavy rider, hard braking, thousands of bumps. He passes. The examiners sign, and his design is locked.' },
+      { st: 5, look: 'plant', h: 'The factory writes his recipe', t: 'The factory plans the build: first the frame with fork and wheels, then handlebar and brakes, then chain, pedals and saddle. Same order, every time.' },
+      { st: 6, look: 'plant', h: 'The shopping list is sent', t: 'The recipe goes to the factory\'s ordering system. It works out how many tyres, chains and brake sets to buy, and when.' },
+      { st: 7, look: 'plant', h: 'Billy is built', t: 'Parts arrive and are checked at the door. Workers build Billy station by station, and the brake test is written in his diary.' },
+      { st: 8, look: 'packaged', h: 'Billy gets his frame number', t: 'Billy gets a number that belongs only to him, stamped on a label. He is packed in a box with his manual and a small tool, and sent to a shop.' },
+      { st: 9, look: 'hospital', h: 'Billy hits the road', t: 'Billy carries his owner to work every day. Once a year he visits the workshop: new tyres, a clean chain, fresh brake pads.' },
+      { st: 10, look: 'service', h: 'Billy squeaks, and is fixed', t: 'One day a brake starts to slip. The makers find out why. They repair Billy, improve the design, and fix every bicycle like him.' }
+    ] },
+    boms: {
+      intro: 'A BOM (bill of materials) is simply a parts list. The bicycle has one set of parts but several lists, because each team needs the parts arranged for its own job. The designer asks "what is it made of?", the factory asks "in what order do I build it?", and the workshop asks "what can I replace?".',
+      follow: 'Follow one part: the tyre BK-TYR-310 appears in all three. In the engineering list it sits directly under the bicycle (quantity 2). In the factory list it sits under "Rolling chassis" because that is where it is fitted. In the service list it sits inside the tyre and tube kit (quantity 1), because a workshop replaces one at a time.',
+      followIds: ['BK-TYR-310'],
+      compare: [
+        ['Question it answers', 'What is it made of?', 'In what order do I build it?', 'What can I replace?'],
+        ['Made by', 'Design Engineer', 'Manufacturing Engineer', 'Service + Design Engineer'],
+        ['Made from', 'The 3D model', 'The EBOM', 'The EBOM'],
+        ['Grouped by', 'Function', 'Build order and station', 'Repair job'],
+        ['Extra items', 'Frame-number label', 'Grease, chain oil, packaging', 'Brake pads, joining link'],
+        ['One per', 'Product', 'Plant', 'Product'],
+        ['Used by', 'Engineering, purchasing', 'Ordering system, production', 'Workshops, spare-part sales']
+      ],
+      list: {
+        ebom: { plain: 'The parts list as the designers think about the bicycle: grouped by what each part does.',
+          how: ['The designer saves the 3D bicycle into Windchill (check-in).', 'Windchill reads the model and creates one part record for each component, with the quantity counted automatically: two wheels, two pedals.', 'The designer adds items that are not in the 3D model, such as the frame-number label.', 'Each line is marked make or buy: the frame and wheels are made, the brakes and chain are bought.', 'The list is reviewed, signed and released.'],
+          pics: [{ ids: [], ex: 0.7, cap: 'Exploded view: every part you see is one line in the engineering list.' }],
+          tree: [[0, 'BK-200', 'CityRide B-200 bicycle', ''], [1, 'BK-FRM-100', 'Frame', ''], [1, 'BK-FRK-200', 'Fork', ''], [1, 'BK-WHL-300', 'Wheel ×2', ''], [1, 'BK-TYR-310', 'Tyre and tube ×2', ''], [1, 'BK-BRK-400', 'Brake set', ''], [1, 'BK-DRV-500', 'Drivetrain', ''], [1, 'BK-PDL-510', 'Pedal ×2', ''], [1, 'BK-HBR-600', 'Handlebar and stem', ''], [1, 'BK-SDL-700', 'Saddle and seat post', ''], [1, 'BK-LGT-800', 'Light set', ''], [1, 'BK-LBL-900', 'Frame-number label (not in the 3D model)', '']] },
+        mbom: { plain: 'The same parts regrouped the way the factory builds: first the rolling chassis, then the controls, then drive and seat. Factory-only items are added.',
+          pics: [{ ids: ['BK-FRM-100', 'BK-FRK-200', 'BK-WHL-300', 'BK-TYR-310'], cap: 'Build group 1: Rolling chassis' }, { ids: ['BK-HBR-600', 'BK-BRK-400'], cap: 'Build group 2: Controls' }, { ids: ['BK-DRV-500', 'BK-PDL-510', 'BK-SDL-700'], cap: 'Build group 3: Drive and seat' }],
+          tree: [[0, 'BK-200', 'CityRide B-200 bicycle (Plant 1000)', ''], [1, 'BK-MFG-010', 'Rolling chassis', 'group'], [2, 'BK-FRM-100', 'Frame', ''], [2, 'BK-FRK-200', 'Fork', ''], [2, 'BK-WHL-300', 'Wheel ×2', ''], [2, 'BK-TYR-310', 'Tyre and tube ×2', ''], [2, 'BK-CON-001', 'Bearing grease 5 g', 'new'], [1, 'BK-MFG-020', 'Controls', 'group'], [2, 'BK-HBR-600', 'Handlebar and stem', ''], [2, 'BK-BRK-400', 'Brake set', ''], [2, 'BK-CON-002', 'Cable ties ×4', 'new'], [1, 'BK-MFG-030', 'Drive and seat', 'group'], [2, 'BK-DRV-500', 'Drivetrain', ''], [2, 'BK-SDL-700', 'Saddle and seat post', ''], [2, 'BK-CON-003', 'Chain oil 2 ml', 'new'], [1, 'BK-LGT-800', 'Light set', ''], [1, 'BK-LBL-900', 'Frame-number label', ''], [1, 'BK-PKG-900', 'Box with manual, tool and loose pedals', 'new']] },
+        sapbom: { plain: 'A copy of the factory list inside the business system, so it can plan purchases and issue parts to production orders.', pics: [],
+          tree: [[0, 'BK-200', 'Material BK-200, BOM usage 1, valid from 2025-07-01', ''], [1, '0010', 'BK-MFG-010 Rolling chassis', ''], [1, '0020', 'BK-MFG-020 Controls', ''], [1, '0030', 'BK-MFG-030 Drive and seat', ''], [1, '0040', 'BK-LGT-800 Light set', ''], [1, '0050', 'BK-LBL-900 Frame-number label', ''], [1, '0060', 'BK-PKG-900 Box set', '']] },
+        sbom: { q: 'What can the workshop replace?', plain: 'Only the parts a workshop may replace, grouped into ready-made repair kits. The frame is not on it: a cracked frame is not repaired.',
+          how: ['Service and design go through the engineering list and decide which parts a workshop can safely replace.', 'Parts that are changed together become a kit: brake pads with a new cable.', 'Parts that are never repaired, such as the frame, are left out.', 'When a part is redesigned, the service list says which version replaces which.', 'The list is released and feeds the spare-parts catalogue.'],
+          pics: [{ ids: ['BK-BRK-400'], cap: 'Brake pad kit' }, { ids: ['BK-TYR-310'], cap: 'Tyre and tube kit' }, { ids: ['BK-DRV-500'], cap: 'Chain kit' }],
+          tree: [[0, 'BK-200', 'CityRide B-200 serviceable items', ''], [1, 'BK-KIT-400', 'Brake pad kit', 'group'], [2, 'BK-SPR-401', 'Brake pads ×2', 'new'], [2, 'BK-SPR-402', 'Brake cable', 'new'], [1, 'BK-KIT-310', 'Tyre and tube kit', 'group'], [2, 'BK-TYR-310', 'Tyre and tube ×1', ''], [1, 'BK-KIT-500', 'Chain kit', 'group'], [2, 'BK-SPR-501', 'Chain', 'new'], [2, 'BK-SPR-502', 'Joining link', 'new'], [1, 'BK-PDL-510', 'Pedal (pair, single spare part)', ''], [1, 'BK-SDL-700', 'Saddle (single spare part)', '']] },
+        pbom: { plain: 'Everything that goes around and with the bicycle when it ships: box, protectors, manual, a small tool.',
+          pics: [{ ids: [], look: 'packaged', cap: 'Packed in its box with the label on the outside.' }],
+          tree: [[0, 'BK-PKG-900', 'Box set', ''], [1, 'BK-PKG-910', 'Shipping carton', ''], [1, 'BK-PKG-920', 'Foam protector ×6', ''], [1, 'BK-MAN-200', 'Owner\'s manual', ''], [1, 'BK-PKG-930', 'Hex key tool', ''], [1, 'BK-PDL-510', 'Pedal ×2 (shipped loose)', '']] }
+      }
+    }
+  },
+
   laneInfo: {
     projectlink: { plain: 'Teamwork & plan', what: 'Who does what, by when. The shared to-do list of the whole project.', like: 'Like the group chat and shared calendar for a school project.',
       short: ['Set up team', 'Share designs', 'Track BOM tasks', 'Freeze gate', 'Factory joins', 'Go-live checklist', 'Log pilot issues', 'Launch gate', 'Lessons learned', 'New projects'] },

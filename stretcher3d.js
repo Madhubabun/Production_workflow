@@ -9,7 +9,8 @@
   var T = window.THREE;
   var api = { ready: false };
   var el, opts, renderer, scene, camera, root, raycaster, pointer;
-  var groups = [];          // every part group
+  var models = {}, product = 'stretcher', labelTex = {}, labelMesh = null;   // one model per product
+  var groups = [];          // every part group of the product on show
   var meshes = [];          // every pickable mesh
   var props = {};           // scenery per mode
   var running = false, raf = 0, last = 0;
@@ -174,6 +175,74 @@
     groups.forEach(function (gr) { gr.userData.base.copy(gr.position); });
   }
 
+  /* ---------------- the bicycle: a second, simpler product ---------------- */
+  function buildBike() {
+    var g, FR = 0x2f9bff, DARK = 0x222b33, CH = 0xd5dce2, TY = 0x1c2229;
+    var RA = [-0.5, 0.34, 0], FA = [0.56, 0.34, 0], BB = [-0.08, 0.29, 0], ST = [-0.2, 0.84, 0], HT = [0.36, 0.88, 0], HB = [0.41, 0.7, 0];
+
+    g = part('BK-FRM-100', [0, 0, 0]);                       // frame
+    rod(g, FR, BB, ST, 0.02); rod(g, FR, ST, HT, 0.018); rod(g, FR, HB, BB, 0.022); rod(g, FR, HT, HB, 0.024);
+    [-0.05, 0.05].forEach(function (z) {
+      rod(g, FR, [BB[0], BB[1], z], [RA[0], RA[1], z], 0.011);
+      rod(g, FR, [ST[0], ST[1] - 0.04, z * 0.6], [RA[0], RA[1], z], 0.009);
+    });
+
+    g = part('BK-FRK-200', [0.35, 0, 0]);                    // fork
+    [-0.05, 0.05].forEach(function (z) { rod(g, CH, [HB[0], HB[1], z], [FA[0], FA[1], z], 0.011); });
+    rod(g, CH, [HB[0], HB[1], -0.05], [HB[0], HB[1], 0.05], 0.012);
+
+    [[RA, -1], [FA, 1]].forEach(function (w) {               // wheels and tyres
+      var c = w[0];
+      g = part('BK-WHL-300', [w[1] * 0.45, 0, 0]);
+      add(g, new T.TorusGeometry(0.31, 0.012, 6, 28), CH, c);
+      wheel(g, 0x8d99a6, 0.03, 0.09, c);
+      for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; rod(g, CH, c, [c[0] + 0.31 * Math.cos(a), c[1] + 0.31 * Math.sin(a), 0], 0.003); }
+      g = part('BK-TYR-310', [w[1] * 0.45, 0, 0.32]);
+      add(g, new T.TorusGeometry(0.33, 0.022, 6, 28), TY, c);
+    });
+
+    g = part('BK-BRK-400', [0, 0.32, 0.3]);                  // brake set
+    box(g, 0xd03a2a, 0.05, 0.06, 0.08, [0.45, 0.69, 0]);
+    box(g, 0xd03a2a, 0.05, 0.06, 0.08, [-0.34, 0.67, 0]);
+    box(g, DARK, 0.03, 0.03, 0.09, [0.48, 0.955, 0.19]);
+    box(g, DARK, 0.03, 0.03, 0.09, [0.48, 0.955, -0.19]);
+    add(g, new T.TubeGeometry(new T.CatmullRomCurve3([new T.Vector3(0.48, 0.95, 0.16), new T.Vector3(0.52, 0.86, 0.08), new T.Vector3(0.47, 0.74, 0.03)]), 20, 0.005, 6, false), DARK);
+
+    g = part('BK-DRV-500', [0, -0.05, 0.42]);                // drivetrain
+    wheel(g, CH, 0.09, 0.008, [BB[0], BB[1], 0.06]);
+    wheel(g, CH, 0.04, 0.012, [RA[0], RA[1], 0.06]);
+    rod(g, DARK, [BB[0], BB[1] + 0.09, 0.06], [RA[0], RA[1] + 0.04, 0.06], 0.006);
+    rod(g, DARK, [BB[0], BB[1] - 0.09, 0.06], [RA[0], RA[1] - 0.04, 0.06], 0.006);
+    rod(g, 0x8d99a6, [BB[0], BB[1], 0.075], [BB[0] + 0.12, BB[1] - 0.1, 0.075], 0.01);
+    rod(g, 0x8d99a6, [BB[0], BB[1], -0.075], [BB[0] - 0.12, BB[1] + 0.1, -0.075], 0.01);
+    rod(g, 0x8d99a6, [BB[0], BB[1], -0.075], [BB[0], BB[1], 0.075], 0.014);
+
+    g = part('BK-PDL-510', [0, 0, 0.36]); box(g, DARK, 0.09, 0.02, 0.07, [BB[0] + 0.12, BB[1] - 0.1, 0.125]);   // pedals
+    g = part('BK-PDL-510', [0, 0, -0.36]); box(g, DARK, 0.09, 0.02, 0.07, [BB[0] - 0.12, BB[1] + 0.1, -0.125]);
+
+    g = part('BK-HBR-600', [0.2, 0.36, 0]);                  // handlebar and stem
+    rod(g, CH, HT, [0.44, 0.96, 0], 0.014);
+    rod(g, CH, [0.44, 0.96, -0.2], [0.44, 0.96, 0.2], 0.012);
+    rod(g, DARK, [0.44, 0.96, 0.2], [0.44, 0.96, 0.28], 0.016);
+    rod(g, DARK, [0.44, 0.96, -0.2], [0.44, 0.96, -0.28], 0.016);
+
+    g = part('BK-SDL-700', [-0.15, 0.4, 0]);                 // saddle and seat post
+    rod(g, CH, ST, [-0.22, 0.95, 0], 0.013);
+    box(g, DARK, 0.25, 0.04, 0.13, [-0.24, 0.975, 0]);
+
+    g = part('BK-LGT-800', [0, 0.6, 0]);                     // light set
+    box(g, 0xffe27a, 0.05, 0.05, 0.05, [0.5, 0.9, 0]);
+    box(g, 0xe0362b, 0.03, 0.04, 0.04, [-0.275, 0.9, 0]);
+
+    groups.forEach(function (gr) { gr.userData.base.copy(gr.position); });
+  }
+  function usePointers(name) { var m = models[name]; root = m.root; groups = m.groups; meshes = m.meshes; }
+  function showProduct(name) {
+    models[product].root.visible = false;
+    product = name; usePointers(name); root.visible = true;
+    if (labelMesh && labelTex[name]) { labelMesh.material.map = labelTex[name]; labelMesh.material.needsUpdate = true; }
+  }
+
   /* ---------------- scenery per lifecycle look ---------------- */
   function pmesh(group, geo, color, pos, opacity) {
     var m = new T.Mesh(geo, new T.MeshStandardMaterial({ color: color, roughness: 0.8, metalness: 0.05, transparent: true, opacity: 0, depthWrite: false }));
@@ -181,17 +250,17 @@
     if (pos) m.position.set(pos[0], pos[1], pos[2]);
     group.add(m); return m;
   }
-  function labelTexture() {
+  function labelTexture(L) {
     var c = document.createElement('canvas'); c.width = 512; c.height = 320;
     var x = c.getContext('2d');
     x.fillStyle = '#fff'; x.fillRect(0, 0, 512, 320);
-    x.fillStyle = '#0b3040'; x.font = 'bold 30px Arial'; x.fillText('MediCare Devices Ltd', 20, 44);
-    x.font = '26px Arial'; x.fillText('TransPort T-300P  Stretcher', 20, 82);
-    x.font = '20px Arial'; x.fillText('SWL 250 kg     REF MC-STR-3000', 20, 114);
+    x.fillStyle = '#0b3040'; x.font = 'bold 30px Arial'; x.fillText(L ? L[0] : 'MediCare Devices Ltd', 20, 44);
+    x.font = '26px Arial'; x.fillText(L ? L[1] : 'TransPort T-300P  Stretcher', 20, 82);
+    x.font = '20px Arial'; x.fillText(L ? L[2] : 'SWL 250 kg     REF MC-STR-3000', 20, 114);
     var seed = 7; for (var i = 0; i < 26; i++) for (var j = 0; j < 14; j++) { seed = (seed * 73 + 19) % 101; if (seed % 2 || i === 0 || j === 13) x.fillRect(20 + i * 6, 136 + j * 6, 6, 6); }
     x.font = '19px Consolas, monospace';
-    x.fillText('(01)09999999300017', 196, 160); x.fillText('(11)250915', 196, 188); x.fillText('(21)T3P-250001', 196, 216);
-    x.font = 'bold 22px Arial'; x.fillText('UDI', 196, 132);
+    x.fillText(L ? L[3] : '(01)09999999300017', 196, 160); x.fillText(L ? L[4] : '(11)250915', 196, 188); x.fillText(L ? L[5] : '(21)T3P-250001', 196, 216);
+    x.font = 'bold 22px Arial'; x.fillText(L ? 'ID' : 'UDI', 196, 132);
     x.font = '15px Arial'; x.fillText('Training sample. Not a registered identifier.', 20, 300);
     var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return t;
   }
@@ -216,7 +285,8 @@
     g = new T.Group(); props.packaged = g;
     pmesh(g, new T.BoxGeometry(2.5, 0.1, 1.05), 0x9c7a4d, [0, -0.06, 0]);
     pmesh(g, new T.BoxGeometry(2.4, 1.98, 0.96), 0xc79f6e, [-0.02, 0.99, 0], 0.5);
-    m = new T.Mesh(new T.PlaneGeometry(0.62, 0.39), new T.MeshBasicMaterial({ map: labelTexture(), transparent: true, opacity: 0 }));
+    m = new T.Mesh(new T.PlaneGeometry(0.62, 0.39), new T.MeshBasicMaterial({ map: (labelTex.stretcher = labelTexture()), transparent: true, opacity: 0 }));
+    labelMesh = m; labelTex.bike = labelTexture(['MediCare Cycles (invented)', 'CityRide B-200  Bicycle', 'Max load 120 kg     REF BK-200', 'Model BK-200', 'Made 2025-09', 'Serial B2-250001']);
     m.material.userData.o = 1; m.position.set(0.55, 0.95, 0.485); g.add(m);
     m = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(2.4, 1.98, 0.96)), new T.LineBasicMaterial({ color: 0x7a5a30, transparent: true, opacity: 0 }));
     m.material.userData.o = 0.9; m.position.set(-0.02, 0.99, 0); g.add(m);
@@ -270,7 +340,7 @@
     });
 
     ['windchill', 'plant', 'packaged', 'hospital', 'service'].forEach(function (key) {
-      var g = props[key], want = (props[mode] === g) ? 1 : 0;
+      var g = props[key], want = (props[mode] === g && (product === 'stretcher' || (key !== 'hospital' && key !== 'service'))) ? 1 : 0;
       g.userData.w += (want - g.userData.w) * k;
       g.visible = g.userData.w > 0.01;
       if (!g.visible) return;
@@ -366,7 +436,11 @@
     var d2 = new T.DirectionalLight(0xbfe0ff, 0.3); d2.position.set(-4, 3, -3); scene.add(d2);
     root = new T.Group(); scene.add(root);
     raycaster = new T.Raycaster(); pointer = new T.Vector2(); tmpC = new T.Color();
-    build(); buildProps(); bind();
+    build(); models.stretcher = { root: root, groups: groups, meshes: meshes };
+    root = new T.Group(); root.visible = false; scene.add(root); groups = []; meshes = [];
+    buildBike(); models.bike = { root: root, groups: groups, meshes: meshes };
+    usePointers('stretcher');
+    buildProps(); bind();
     api.ready = true; resize();
     meshes.forEach(function (m) { m.material.opacity = MODES[mode].op; m.userData.edge.material.opacity = MODES[mode].edge; });
     api.start();
@@ -388,17 +462,21 @@
   api.resetView = function () { var c = MODES[mode].cam; camT.th = c.th; camT.ph = c.ph; camT.r = c.r; };
   api.flyTo = function (c) { if (c.th != null) camT.th = c.th; if (c.ph != null) camT.ph = c.ph; if (c.r != null) camT.r = c.r; autoRotate = false; };
   api.orbit = function (d) { camT.th += d; };
+  api.setProduct = function (name) { if (!api.ready || !models[name] || name === product) return; showProduct(name); hover = null; selected = null; };
+  api.product = function () { return product; };
 
   /* Still picture of the stretcher with the given parts in full colour and the
      rest ghosted. Returns a PNG data URL (cached), or null when 3D is unavailable. */
   var snapCache = {};
-  api.snapshot = function (ids, w, h, look, ex) {
+  api.snapshot = function (ids, w, h, look, ex, prod) {
     ex = Math.max(0, Math.min(1, +ex || 0));
     if (!api.ready) return null;
     ids = (ids || []).filter(Boolean);
+    var shown = product; prod = models[prod] ? prod : product;
     var L = look && MODES[look] ? MODES[look] : null;
-    var key = (ids.length ? ids.join(',') : 'all') + '|' + theme + '|' + powered + '|' + (L ? look : '') + '|' + ex;
+    var key = prod + '|' + (ids.length ? ids.join(',') : 'all') + '|' + theme + '|' + powered + '|' + (L ? look : '') + '|' + ex;
     if (snapCache[key]) return snapCache[key];
+    if (prod !== shown) showProduct(prod);
     w = w || 520; h = h || 320;
     var focus = {}, all = !ids.length, url = null;
     ids.forEach(function (id) { focus[id] = 1; });
@@ -427,7 +505,7 @@
       return s;
     });
     var keys = ['windchill', 'plant', 'packaged', 'hospital', 'service'], pSaved = keys.map(function (k) { var v = props[k].visible; props[k].visible = false; return v; });
-    var scenery = L && props[look] ? props[look] : null;
+    var scenery = L && props[look] && (product === 'stretcher' || (look !== 'hospital' && look !== 'service')) ? props[look] : null;
     if (scenery) { scenery.visible = true; scenery.traverse(function (o) { if (o.material) { o.material.opacity = o.material.userData.o; o.material.depthWrite = o.material.userData.o > 0.9; if (o.userData.pulse) o.scale.set(1, 1, 1); } }); }
     var size = new T.Vector2(); renderer.getSize(size);
     var camPos = camera.position.clone(), camAspect = camera.aspect;
@@ -451,6 +529,7 @@
     root.position.y = rootY;
     if (size.x && size.y) renderer.setSize(size.x, size.y, false);
     camera.aspect = camAspect; camera.updateProjectionMatrix(); camera.position.copy(camPos); camera.lookAt(target);
+    if (prod !== shown) showProduct(shown);
     if (running) renderer.render(scene, camera);
     if (url) snapCache[key] = url;
     return url;
