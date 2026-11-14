@@ -24,9 +24,14 @@
       <a href="#home" data-nav="home">Journey</a>
       <a href="#parts" data-nav="parts">Parts &amp; BOM</a>
       <a href="#trace" data-nav="trace">Follow a part</a>
+      <a href="#capa" data-nav="capa">CAPA story</a>
+      <a href="#roles" data-nav="roles">Roles</a>
+      <a href="#modules" data-nav="modules">Module map</a>
       <a href="#glossary" data-nav="glossary">Glossary</a>
     </nav>
     <div class="tools">
+      <button type="button" class="btn play" data-play>▶ Play the journey</button>
+      <label class="rolesel"><span>View as</span> <select id="roleSel" aria-label="View the site as a role"></select></label>
       <label class="search"><span class="sr">Search terms</span>
         <input id="q" type="search" placeholder="Search a term, e.g. UDI" autocomplete="off">
       </label>
@@ -49,9 +54,10 @@
     <section class="card" aria-labelledby="mapH">
       <div class="card-h">
         <h2 id="mapH">The journey in 10 stages</h2>
-        <p class="hint">Select a stage. The stretcher, the data flow and the panel below follow it.</p>
+        <p class="hint">Select a stage. Each row under the map is a team that works alongside; the cards below say what each team is doing right now.</p>
       </div>
       <div class="map-scroll" tabindex="0" aria-label="Journey map, scroll sideways on small screens"><div id="map" class="map"></div></div>
+      <div id="laneNow" class="lane-now" aria-live="polite"></div>
     </section>
 
     <div class="two">
@@ -104,11 +110,11 @@
     </section>
 
     <section class="roadmap" aria-labelledby="rmH">
-      <h2 id="rmH">What this site covers</h2>
+      <h2 id="rmH">More to explore</h2>
       <div class="rm-grid">
-        <div><h3>Available now</h3><p>Journey map with parallel lanes, 3D stretcher with lifecycle looks and explode view, hover tips and detail drawers for every term and part, full pages for all 10 stages, procurement and service animations, follow-a-part digital thread, parts list, searchable glossary.</p></div>
-        <div><h3>Next: Phase 3</h3><p>The brake complaint → CAPA story with a sample record at every step, role views with RACI, and the QMS module map.</p></div>
-        <div><h3>Also in Phase 3</h3><p>150+ glossary terms, the guided "Play the journey" tour, final polish and testing.</p></div>
+        <div><h3><a href="#capa">CAPA story</a></h3><p>"Brake fails to lock on one castor": 15 steps from the complaint to closure, with the record and signatures at every step.</p></div>
+        <div><h3><a href="#roles">Roles</a> and <a href="#modules">Module map</a></h3><p>See the journey as your own role, with tasks, approvals and screens. Then see which system handles which quality process.</p></div>
+        <div><h3><a href="#trace">Follow a part</a> and <a href="#glossary">Glossary</a></h3><p>Trace any part through its digital thread, or look up any of 160 terms with a simple explanation, an expert one and an example.</p></div>
       </div>
     </section>
   </section>
@@ -139,6 +145,22 @@
 </aside>
 
 <div id="tip" class="tip" role="tooltip" hidden></div>
+
+<!-- Guided tour bar: "Play the journey" -->
+<div id="tour" class="tour" role="region" aria-label="Guided tour of the journey" hidden>
+  <div class="tour-track"><div id="tourFill" class="tour-fill"></div></div>
+  <div class="tour-in">
+    <div class="tour-text"><div id="tourDots" class="tour-dots" aria-hidden="true"></div><p id="tourCap" aria-live="polite"></p></div>
+    <div class="tour-ctl">
+      <button type="button" class="iconbtn" id="tPrev" aria-label="Previous stage">⏮</button>
+      <button type="button" class="iconbtn big" id="tPlay" aria-label="Pause">⏸</button>
+      <button type="button" class="iconbtn" id="tNext" aria-label="Next stage">⏭</button>
+      <label>Speed <select id="tSpeed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+      <label>Jump to <select id="tJump"></select></label>
+      <button type="button" class="iconbtn" id="tClose" aria-label="Close the tour">✕</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="data.js"></script>

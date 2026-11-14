@@ -897,4 +897,108 @@
     `Collection of supplier declarations per [[manufacturer-part]] ([[rohs]], [[reach]], conflict minerals, PFAS, battery rules) and roll-up across the BOM; PTC offers a product-compliance capability for this {V}. [[biocompatibility]] is handled separately under ISO 10993.`,
     `The T-300P roll-up: RoHS compliant with exemptions listed for the PCBA; REACH: no SVHC above 0.1 %.`,
     'rohs reach biocompatibility manufacturer-part');
+
+  /* ================= Phase 3 additions ================= */
+  T('fta', 'FTA', 'Risk', `Fault Tree Analysis: starting from one bad event and working down to everything that could cause it.`,
+    `Pick one thing that must not happen, such as "stretcher rolls away", and draw a tree of all the ways it could happen.`,
+    `Asking "how could we possibly miss the flight?" and listing every route to that outcome: traffic, lost passport, wrong day.`,
+    `Top-down deductive method (IEC 61025): top event, intermediate events, basic events, AND / OR gates; can be quantified with failure rates. Complements the bottom-up [[dfmea]]. Available in Windchill Risk and Reliability {V}.`,
+    `Top event "Unintended movement during transfer" (HAZ-007) = brake not applied OR castor brake fails OR linkage slips.`,
+    'dfmea hazard risk-file iso14971');
+  T('root-cause', 'Root cause analysis', 'Quality', `Finding the real reason a problem happened, not just its symptom.`,
+    `Keep asking "why?" until you reach something you can change so the problem cannot return.`,
+    `A cough is the symptom; the infection is the root cause. Cough syrup alone will not cure it.`,
+    `Structured methods: 5-Why, fishbone (Ishikawa), fault tree, is / is-not. Required before corrective action under [[iso13485]] 8.5.2. Evidence-based: each "why" is confirmed with data.`,
+    `Brake fails to lock → cam too low → mould insert worn after repair → supplier change not notified, and our drawing had no cam dimension.`,
+    'capa fta scar nc');
+  T('effectiveness-check', 'Effectiveness check', 'Quality', `Checking, after some time, that a corrective action really solved the problem.`,
+    `Weeks or months after the fix, look at the numbers again. If the problem is gone, close the case. If not, the fix was wrong.`,
+    `Stepping on the scales a month after starting a diet.`,
+    `Final CAPA phase ([[iso13485]] 8.5.2 f): criteria and time window defined when the CAPA is opened; uses complaint, NC and process data.`,
+    `CAPA-2026-0017: zero brake-lock complaints in 3 months and 412 units; OP20 Cpk 1.71.`,
+    'capa root-cause pms');
+  T('containment', 'Containment', 'Quality', `Immediate action to stop a problem spreading while the cause is investigated.`,
+    `First stop the bleeding: block suspect stock, check what is already built, before working on the cure.`,
+    `Closing the tap before repairing the pipe.`,
+    `Short-term actions on product at risk: quarantine, sorting, 100 % inspection, shipment hold. Recorded on the [[nc]] or CAPA; does not replace corrective action.`,
+    `Lot NCW-L2604 blocked in SAP and tested 100 %; 14 units in production re-tested.`,
+    'nc mrb capa');
+  T('reportability', 'Reportability decision', 'Regulation', `The documented decision whether an event must be reported to the authorities.`,
+    `For every complaint someone must decide and sign: do we have to tell the regulator, yes or no, and why.`,
+    `Deciding whether an accident must be reported to the police, and writing down the reason.`,
+    `Assessment against 21 CFR 803 ([[emdr]]) and [[eumdr]] Art. 87 ([[vigilance]]) criteria. The clock starts at awareness. "Not reportable" needs a rationale as much as "reportable".`,
+    `RPT-2026-0231: brake complaint judged not reportable; to be re-assessed on recurrence.`,
+    'emdr vigilance complaint fsca');
+  T('csv', 'Computer system validation (CSV)', 'Regulation', `Proof that a computer system used for quality work does what it should, reliably.`,
+    `Before Windchill or SAP may be trusted for approvals and records, the company tests and documents that it works correctly as set up.`,
+    `Calibrating a weighing scale before trusting its readings.`,
+    `Required by [[part11]] 11.10(a) and [[iso13485]] 4.1.6 / 7.5.6 for software used in the QMS and production. Risk-based: requirements, configuration specification, testing, change control, periodic review. Also covers interfaces such as [[esi]].`,
+    `The Windchill release workflow with e-signatures and the Windchill-to-SAP interface are validated and re-tested after upgrades.`,
+    'part11 esign audit-trail esi');
+  T('audit', 'Audit', 'Quality', `A systematic, independent check that the quality system is followed and works.`,
+    `Someone independent looks at records and talks to people to see whether the company does what its procedures say.`,
+    `A school inspection.`,
+    `Internal audits ([[iso13485]] 8.2.4), supplier audits (7.4), and external audits by a [[notified-body]], MDSAP auditing organisation or [[fda]] inspection. Findings are tracked and may raise a [[capa]].`,
+    `Internal audit IA-2026-03 sampled promotion request PR-2025-0042 and its signatures.`,
+    'capa notified-body fda management-review');
+  T('training-record', 'Training record', 'Quality', `Proof that a person was trained on a procedure or work instruction before doing the job.`,
+    `A record showing who learned which procedure, and when. No record, no proof they were qualified.`,
+    `A driving licence: evidence you were trained before you drive.`,
+    `[[iso13485]] 6.2. Usually kept in a learning management system outside Windchill; release of a new document revision triggers a training assignment. Effectiveness of training must be evaluated.`,
+    `Operators at bench B1 were trained on WI-OP10 revision B before serial T3P-260400 was built.`,
+    'work-instruction audit');
+  T('management-review', 'Management review', 'Quality', `Top management's regular review of how the quality system is performing.`,
+    `At planned intervals the leaders look at complaints, audits, CAPAs and trends, and decide on improvements and resources.`,
+    `A yearly health check-up for the company's quality system.`,
+    `[[iso13485]] 5.6: inputs include feedback, complaint handling, reporting to authorities, audits, process and product monitoring, CAPA, changes; outputs are decisions and actions, recorded.`,
+    `The 2026 review covered the brake CAPA and approved critical-dimension reviews on all source-control drawings.`,
+    'audit capa pms');
+  T('digital-thread', 'Digital thread', 'PLM', `The connected chain of data that follows a product from requirement to field use.`,
+    `Every record about a part is linked to the next, so you can follow the line from "why do we need this" to "which hospital has it".`,
+    `A parcel's tracking history, but for the whole life of a product.`,
+    `Linked data across systems: requirements, CAD, [[ebom]], [[mbom]], process plan, ERP materials and orders, [[dhr]], [[udi]], service and quality records. Enables impact analysis forwards and [[traceability]] backwards.`,
+    `The "Follow a part" page shows the thread of castor MC-CST-6000 in 16 steps.`,
+    'traceability plm dhr');
+  T('technical-documentation', 'Technical documentation', 'Regulation', `The file that proves to European authorities that a device meets the requirements.`,
+    `A complete, organised file about the device: what it is, how it is made, its risks, its tests, its labels.`,
+    `The folder of documents you hand in with a building permit application.`,
+    `[[eumdr]] Annex II (device description, design and manufacturing information, GSPR checklist, benefit-risk and risk management, verification and validation) and Annex III (post-market surveillance). Kept current through change control.`,
+    `The T-300 technical file is assembled from released Windchill documents and baseline BL-0007, updated with BL-0019.`,
+    'eumdr doc dhf mdf');
+  T('basic-udi-di', 'Basic UDI-DI', 'Regulation', `The EU identifier for a device family, used in databases and certificates but not printed on the label.`,
+    `One umbrella code for a group of closely related models. It appears in paperwork, not on the product.`,
+    `A family surname, while each family member has their own first name (the UDI-DI).`,
+    `[[eumdr]] Annex VI Part C: primary key in [[eudamed]], referenced in certificates and the [[doc|declaration of conformity]]. Groups devices with the same intended purpose, risk class and essential design.`,
+    `T-300M and T-300P share one Basic UDI-DI; each has its own [[udi-di]].`,
+    'udi-di eudamed doc');
+  T('field-safety-notice', 'Field safety notice', 'Regulation', `The letter sent to customers telling them about a safety problem and what to do.`,
+    `An official warning letter to every affected hospital: what the problem is, which devices, and the action to take.`,
+    `A recall letter from a car maker.`,
+    `Communication accompanying an [[fsca]] ([[eumdr]] Art. 89(8)); content agreed with or submitted to the competent authority; receipt and action confirmation tracked per customer.`,
+    `Not needed for the brake issue, because a service bulletin was judged sufficient.`,
+    'fsca vigilance service-bulletin');
+  T('design-change', 'Design change', 'Design controls', `A controlled modification to a released design.`,
+    `Once a design is approved, every change must be reviewed, tested as needed and approved before it is used.`,
+    `Changing a published recipe: test it again and issue a new edition.`,
+    `[[iso13485]] 7.3.9: identify, review, verify, validate as appropriate and approve before implementation; evaluate effect on parts, product in process or delivered, risk management and regulatory filings. Executed through [[change-request]] and [[change-notice]].`,
+    `Castor revision B: new cam geometry, repeated VT-012 and VT-014, DFMEA re-scored.`,
+    'change-request change-notice revision effectivity');
+  T('first-article', 'First article inspection', 'Quality', `A full check of the first part or unit made after a new design, tool or change.`,
+    `Measure the very first piece completely before making the rest.`,
+    `Tasting the first pancake before cooking the whole batch.`,
+    `Complete dimensional and functional verification of the first production item against the drawing; used at supplier qualification, new tooling and after changes. Evidence for [[design-transfer]] and change cut-in.`,
+    `First-article approval of castor revision B on 2026-07-13 before serial T3P-260400.`,
+    'design-transfer inspection-lot effectivity');
+  T('coc', 'Certificate of conformity', 'Supplier', `A supplier's signed statement that a delivery meets the ordered specification.`,
+    `A paper that comes with a delivery saying: these parts were made and checked to your drawing.`,
+    `A hallmark certificate that comes with jewellery.`,
+    `Supplier document referencing PO, part number, drawing revision, lot and results where required; a purchasing requirement under [[iso13485]] 7.4.2 and checked at [[goods-receipt]] / in the [[inspection-lot]].`,
+    `Lot NCW-L2509 arrived with a certificate referencing drawing MC-CST-6000 revision A.`,
+    'po goods-receipt inspection-lot');
+  T('as-built', 'As-built / as-maintained', 'Service', `The exact parts a specific unit was built with, and how that changed through repairs.`,
+    `A record of what is really inside one particular stretcher today, not what the design says in general.`,
+    `Your car's service book: original parts plus everything replaced since.`,
+    `As-built configuration comes from the [[dhr]] genealogy at shipment; as-maintained is updated by each service order. Compared with the as-designed [[ebom]] to target field actions.`,
+    `T3P-250118: as-built with castor lot NCW-L2510; as-maintained after 2026-05-06 with one castor of lot NCW-L2601.`,
+    'installed-base dhr field-service');
 })();

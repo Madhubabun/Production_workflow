@@ -387,5 +387,63 @@
   api.zoom = function (f) { autoRotate = false; camT.r = Math.max(1.8, Math.min(9, camT.r * f)); };
   api.resetView = function () { var c = MODES[mode].cam; camT.th = c.th; camT.ph = c.ph; camT.r = c.r; };
   api.flyTo = function (c) { if (c.th != null) camT.th = c.th; if (c.ph != null) camT.ph = c.ph; if (c.r != null) camT.r = c.r; autoRotate = false; };
+  api.orbit = function (d) { camT.th += d; };
+
+  /* Still picture of the stretcher with the given parts in full colour and the
+     rest ghosted. Returns a PNG data URL (cached), or null when 3D is unavailable. */
+  var snapCache = {};
+  api.snapshot = function (ids, w, h) {
+    if (!api.ready) return null;
+    ids = (ids || []).filter(Boolean);
+    var key = (ids.length ? ids.join(',') : 'all') + '|' + theme + '|' + powered;
+    if (snapCache[key]) return snapCache[key];
+    w = w || 520; h = h || 320;
+    var focus = {}, all = !ids.length, url = null;
+    ids.forEach(function (id) { focus[id] = 1; });
+    var gSaved = groups.map(function (g) { return [g.visible, g.scale.x, g.position.clone()]; });
+    var rootY = root.position.y; root.position.y = 0;
+    groups.forEach(function (g) {
+      var u = g.userData; g.position.copy(u.base); g.scale.setScalar(1);
+      g.visible = !u.opt || powered || !!focus[u.partId];
+    });
+    root.updateMatrixWorld(true);
+    var box = new T.Box3(), any = false;
+    groups.forEach(function (g) { if (g.visible && (all || focus[g.userData.partId])) { box.expandByObject(g); any = true; } });
+    if (!any) { all = true; groups.forEach(function (g) { if (g.visible) box.expandByObject(g); }); }
+    var mSaved = meshes.map(function (m) {
+      var mat = m.material, e = m.userData.edge, em = e.material;
+      var s = [mat.color.getHex(), mat.opacity, mat.emissive.getHex(), mat.emissiveIntensity, mat.depthWrite, em.opacity, em.color.getHex(), e.visible];
+      var f = all || !!focus[m.userData.partId];
+      mat.color.copy(m.userData.real); mat.opacity = f ? 1 : 0.06; mat.emissive.set(0x000000); mat.emissiveIntensity = 0; mat.depthWrite = f;
+      em.opacity = f ? 0 : 0.3; em.color.set(INK[theme]); e.visible = !f;
+      return s;
+    });
+    var keys = ['windchill', 'plant', 'packaged', 'hospital', 'service'], pSaved = keys.map(function (k) { var v = props[k].visible; props[k].visible = false; return v; });
+    var size = new T.Vector2(); renderer.getSize(size);
+    var camPos = camera.position.clone(), camAspect = camera.aspect;
+    try {
+      renderer.setSize(w, h, false);
+      var c = box.getCenter(new T.Vector3()), rad = Math.max(box.getSize(new T.Vector3()).length() / 2, 0.28);
+      var dist = Math.max(rad / Math.sin(camera.fov * Math.PI / 360) * 0.82, 1.1), th = -0.78, ph = 1.05, sp = Math.sin(ph);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      camera.position.set(c.x + dist * sp * Math.sin(th), c.y + dist * Math.cos(ph), c.z + dist * sp * Math.cos(th)); camera.lookAt(c);
+      renderer.render(scene, camera);
+      url = renderer.domElement.toDataURL('image/png');
+    } catch (err) { url = null; }
+    // put everything back exactly as it was
+    meshes.forEach(function (m, i) {
+      var s = mSaved[i], mat = m.material, e = m.userData.edge;
+      mat.color.setHex(s[0]); mat.opacity = s[1]; mat.emissive.setHex(s[2]); mat.emissiveIntensity = s[3]; mat.depthWrite = s[4];
+      e.material.opacity = s[5]; e.material.color.setHex(s[6]); e.visible = s[7];
+    });
+    groups.forEach(function (g, i) { g.visible = gSaved[i][0]; g.scale.setScalar(gSaved[i][1]); g.position.copy(gSaved[i][2]); });
+    keys.forEach(function (k, i) { props[k].visible = pSaved[i]; });
+    root.position.y = rootY;
+    if (size.x && size.y) renderer.setSize(size.x, size.y, false);
+    camera.aspect = camAspect; camera.updateProjectionMatrix(); camera.position.copy(camPos); camera.lookAt(target);
+    if (running) renderer.render(scene, camera);
+    if (url) snapCache[key] = url;
+    return url;
+  };
   window.Stretcher3D = api;
 })();

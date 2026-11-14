@@ -1171,6 +1171,202 @@ window.MD = {
   ],
 
   /* ---------------------------------------------------------------------
+     LANE INFO (Phase 3): plain-language name, one-line meaning, an everyday
+     picture, and a 2-3 word label per stage for the map cells.
+     --------------------------------------------------------------------- */
+  laneInfo: {
+    projectlink: { plain: 'Teamwork & plan', what: 'Who does what, by when. The shared to-do list of the whole project.', like: 'Like the group chat and shared calendar for a school project.',
+      short: ['Set up team', 'Share designs', 'Track BOM tasks', 'Freeze gate', 'Factory joins', 'Go-live checklist', 'Log pilot issues', 'Launch gate', 'Lessons learned', 'New projects'] },
+    suma: { plain: 'Suppliers', what: 'Which companies we are allowed to buy each part from.', like: 'Like a list of trusted shops for each item you need.',
+      short: ['Spot key parts', 'Store datasheets', 'Approve makers', 'Check evidence', 'Approve sellers', 'Send to SAP', 'Score deliveries', 'Label suppliers', 'Watch spares', 'Fix at supplier'] },
+    risk: { plain: 'Safety risks', what: 'What could hurt someone, and what we do to prevent it.', like: 'Like child-proofing a home: find the dangers, add the locks, check again.',
+      short: ['List dangers', 'Design them out', 'Flag critical parts', 'Prove it is safe', 'Factory risks', 'Checks into SAP', 'Do the checks', 'Warn in manual', 'Watch real use', 'Update risk file'] },
+    quality: { plain: 'Quality checks', what: 'Proof that every step was done properly and signed off.', like: 'Like a teacher checking and signing each page of your project.',
+      short: ['Approve the plan', 'Review design', 'Control versions', 'Test & sign', 'Prove the process', 'Recipe in SAP', 'Build record', 'Final release', 'Record service', 'Fix root cause'] },
+    regulatory: { plain: 'Legal approval', what: 'Making sure the stretcher may legally be sold in each country.', like: 'Like getting a passport and visa before travelling.',
+      short: ['Pick the rules', 'List standards', 'Plan the UDI', 'Build the file', 'Check labels', 'Country variants', 'Audit ready', 'Register device', 'Keep watching', 'Report if needed'] }
+  },
+
+  /* ---------------------------------------------------------------------
+     TOUR (Phase 3): narration for "Play the journey", one caption per stage.
+     --------------------------------------------------------------------- */
+  tour: [
+    'Stage 1. It starts as an idea. The team writes down what nurses and porters need, turns each wish into something measurable, and lists what could go wrong. For now the stretcher is only a sketch.',
+    'Stage 2. Engineers build every part in 3D with Creo. Each time they save, Windchill keeps the old version too, so nothing is lost.',
+    'Stage 3. The 3D model becomes an official parts list. Every part gets a number, an owner and a status. The blue glow means: managed in Windchill.',
+    'Stage 4. Tests prove the design works. Independent reviewers sign electronically, and the design is frozen as "Released". Green means safe to build from.',
+    'Stage 5. Manufacturing engineers rearrange the parts list in build order and write the step-by-step recipe for each bench.',
+    'Stage 6. Windchill sends the released data to SAP automatically. SAP can now plan what to buy and when to build.',
+    'Stage 7. Parts arrive and are inspected. Workers assemble the stretcher bench by bench, and every check is recorded against its serial number.',
+    'Stage 8. The stretcher is packed with its instructions and gets its UDI label, a unique code like a passport number. It is registered and shipped.',
+    'Stage 9. In the hospital the stretcher is installed, used every day, checked every year and repaired with approved spare parts.',
+    'Stage 10. A hospital reports a brake that does not lock. The cause is found and fixed for good, and the fix flows back into the design, the factory and the stretchers already in use. The loop is closed.'
+  ],
+
+  /* ---------------------------------------------------------------------
+     ROLE INFO (Phase 3): what each role does, the screens it uses and what
+     it delivers. Tasks and approvals are derived from the stage RACI tables.
+     --------------------------------------------------------------------- */
+  roleInfo: {
+    DE: { what: 'Turns requirements into a design: models, drawings and the engineering parts list. Owns design changes.',
+      screens: ['Creo with the Windchill workspace (check-out / check-in)', 'Windchill part structure browser (EBOM)', 'Promotion request', 'Change task: revise and update parts', 'Windchill Risk and Reliability: DFMEA {V}'],
+      deliv: ['3D models and drawings', 'EBOM with alternates, substitutes and options', 'Design inputs and DFMEA', 'Verification reports', 'Revised parts in change notices'] },
+    ME: { what: 'Decides how the stretcher is built: factory parts list, build steps, benches, tools and instructions.',
+      screens: ['MPMLink BOM Transformer (EBOM → MBOM)', 'Process plan browser: operations, work centres, tooling', 'Work instruction viewer', 'Change task: MBOM and process plan', 'SAP: routing and work centre display'],
+      deliv: ['MBOM per plant', 'Process plan and work instructions', 'PFMEA and control plan', 'Process validation reports', 'Effectivity and stock disposition proposals'] },
+    QE: { what: 'Checks that design and production follow the quality system. Owns the risk file, NC, CAPA and release decisions.',
+      screens: ['Windchill task list: review and approve with e-signature', 'CAPA and nonconformance records {V}', 'Risk file / FMEA', 'SAP QM: inspection lots and usage decisions', 'DHR review in MES'],
+      deliv: ['Risk management plan and report', 'Approvals of releases and changes', 'NC dispositions (MRB)', 'CAPA records with effectiveness checks', 'Final product release'] },
+    RA: { what: 'Makes sure the device may legally be sold and stays compliant: classification, files, UDI, reporting.',
+      screens: ['Windchill documents: regulatory strategy, technical file index', 'UDI data set and submission status {V}', 'Change request: regulatory impact assessment', 'Complaint: reportability decision {V}', 'GUDID / EUDAMED portals'],
+      deliv: ['Regulatory strategy', 'Technical documentation and declaration of conformity', 'UDI registrations', 'Reportability decisions and authority reports', 'Label and IFU approval'] },
+    SC: { what: 'Buys parts from approved sources and keeps supply flowing.',
+      screens: ['SAP: MRP list, purchase requisitions, purchase orders', 'SAP: source list and info records', 'Windchill: AML / AVL view of a part (read)', 'Change request: stock and cost impact'],
+      deliv: ['Purchase orders', 'Enriched material masters (planning, purchasing)', 'Lead-time and cost data', 'Last-time-buy decisions'] },
+    SQ: { what: 'Qualifies suppliers and fixes supplier-caused problems.',
+      screens: ['Windchill Supplier Management: manufacturer and vendor parts, AML / AVL', 'SCAR record {V}', 'SAP QM: incoming inspection results, vendor evaluation'],
+      deliv: ['Supplier qualification records', 'AML / AVL approvals', 'SCARs with verified supplier actions', 'Supplier scorecards'] },
+    CA: { what: 'Runs the change process and the Change Control Board; makes sure releases reach SAP.',
+      screens: ['Windchill change management: problem report, change request, change notice', 'CCB review task', 'Promotion request monitor', 'Baselines', 'Enterprise Systems Transaction Log (ESI)'],
+      deliv: ['CCB decisions', 'Released change notices with effectivity', 'Baselines', 'Successful publication to SAP'] },
+    PR: { what: 'Receives parts, builds, inspects and packs the stretcher.',
+      screens: ['MES: operation screen with work instruction and data collection', 'SAP: goods receipt, production order confirmation', 'Label print and scan-back station', 'NC entry'],
+      deliv: ['Built and tested stretchers', 'DHR data per serial', 'NC reports', 'Packed, labelled shipments'] },
+    SE: { what: 'Installs, maintains and repairs stretchers in hospitals, and reports what is found.',
+      screens: ['SAP service order (mobile)', 'Service BOM and spare kits (Windchill Service view)', 'Service manual and bulletins', 'Installed base record'],
+      deliv: ['Installation and training records', 'Service reports with parts and lots used', 'Returned parts under RMA', 'Completed service bulletins'] },
+    CH: { what: 'Records every customer complaint and makes sure it is evaluated on time.',
+      screens: ['Complaint record: intake, evaluation, investigation {V}', 'Reportability questionnaire', 'Search of similar complaints', 'Link to CAPA'],
+      deliv: ['Complete complaint records', 'Documented evaluations and replies to customers', 'Trend data for post-market surveillance'] },
+    MG: { what: 'Provides people and budget, approves plans and major decisions, and reviews how the quality system performs.',
+      screens: ['Windchill task list: approvals with e-signature', 'ProjectLink project dashboard', 'Quality and CAPA dashboards', 'Management review reports'],
+      deliv: ['Approved plans and gate decisions', 'Declaration of conformity signature', 'Field action decisions', 'Management review minutes'] }
+  },
+
+  /* ---------------------------------------------------------------------
+     MODULE MAP (Phase 3): QMS process | Windchill module | objects | SAP |
+     how it is usually delivered. st = OOTB | Add-on | Config | Outside.
+     --------------------------------------------------------------------- */
+  modules: [
+    { p: 'Requirements and traceability', term: 'traceability', wc: 'Requirements capability in Windchill, or integration with a requirements tool (PTC Codebeamer / RV&S) {V}', obj: 'Requirement, trace link, specification document', sap: 'None: owned by PLM', st: 'Add-on', note: 'Many companies keep requirements as controlled specification documents plus a trace matrix.' },
+    { p: 'Risk management', term: 'risk-file', wc: 'Windchill Risk and Reliability (FMEA, FTA) or controlled documents {V}', obj: 'Hazard, FMEA row, risk control, risk management report', sap: 'SAP QM FMEA (optional)', st: 'Add-on', note: 'Hazard IDs must stay stable so complaints can be coded against them.' },
+    { p: 'Usability file', term: 'iec62366', wc: 'PDMLink document management', obj: 'Use specification, formative and summative reports (WTDocument)', sap: 'None', st: 'OOTB', note: 'Standard documents with links to the risk file.' },
+    { p: 'Design controls / DHF', term: 'dhf', wc: 'PDMLink + ProjectLink; DHF structure or index {V}', obj: 'WTDocument, promotion request, baseline, design review record', sap: 'None', st: 'Config', note: 'Usually a configured document structure and gate deliverables, not one module.' },
+    { p: 'Document control', term: 'wtdocument', wc: 'PDMLink', obj: 'WTDocument, lifecycle, workflow, electronic signature', sap: 'SAP DMS receives released documents (optional)', st: 'OOTB', note: 'Part 11 compliance needs configuration and validation.' },
+    { p: 'Change control / CCB', term: 'ccb', wc: 'Windchill change management', obj: 'Problem report, change request, change notice, change task, variance', sap: 'Engineering change master (change number)', st: 'OOTB', note: 'Workflows and impact questions are configured per company.' },
+    { p: 'Supplier quality', term: 'suma', wc: 'Supplier Management; SCAR in the quality solution {V}', obj: 'Manufacturer part, vendor part, AML / AVL, SCAR', sap: 'Vendor master, source list, info record, QM vendor evaluation', st: 'Add-on', note: 'Supplier master data and commercial terms stay in SAP.' },
+    { p: 'Nonconformance / MRB', term: 'nc', wc: 'Windchill Quality Management: Nonconformance {V}', obj: 'NC, disposition, MRB decision', sap: 'SAP QM quality notification, inspection lot', st: 'Add-on', note: 'Shop-floor NCs are often raised in SAP or MES and escalated to Windchill.' },
+    { p: 'CAPA', term: 'capa', wc: 'Windchill Quality Management: CAPA {V}', obj: 'CAPA, investigation, action plan, effectiveness check', sap: 'QM notification (optional)', st: 'Add-on', note: 'Value comes from linking CAPA to change objects and parts.' },
+    { p: 'Complaints', term: 'complaint', wc: 'Windchill Customer Experience Management {V}', obj: 'Complaint, product, evaluation, investigation', sap: 'Service notification / CRM case', st: 'Add-on', note: 'Intake often starts in a service or CRM system and is transferred.' },
+    { p: 'Regulatory reporting (eMDR, vigilance)', term: 'emdr', wc: 'Regulatory reports within the complaint solution {V}', obj: 'Reportability decision, regulatory report', sap: 'None', st: 'Add-on', note: 'Electronic submission formats change; confirm supported versions.' },
+    { p: 'UDI', term: 'udi', wc: 'Windchill UDI solution {V}', obj: 'UDI data set per UDI-DI, submission record', sap: 'Serial numbers, label printing data', st: 'Add-on', note: 'DI attributes in PLM; production identifiers come from SAP / MES.' },
+    { p: 'Labeling and IFU', term: 'labeling', wc: 'PDMLink (artwork as documents, labels as parts)', obj: 'Artwork document, label part, IFU document', sap: 'Label printing, packaging material', st: 'OOTB', note: 'A dedicated labeling system often prints; Windchill controls the content.' },
+    { p: 'Audits', term: 'audit', wc: 'Audit capability in the quality solution, or a separate QMS tool {V}', obj: 'Audit plan, audit, finding', sap: 'SAP QM audit management (optional)', st: 'Outside', note: 'Frequently handled in a dedicated QMS application.' },
+    { p: 'Training records', term: 'training-record', wc: 'Usually not in Windchill', obj: 'Training assignment triggered by a document release', sap: 'Learning system (for example SAP SuccessFactors)', st: 'Outside', note: 'Said plainly: this normally lives in a learning management system. Windchill only sends the trigger.' },
+    { p: 'Material compliance', term: 'material-compliance', wc: 'Windchill product compliance capability {V}', obj: 'Material declaration, substance, compliance roll-up', sap: 'SAP product compliance', st: 'Add-on', note: 'Supplier declarations attach to manufacturer parts.' },
+    { p: 'DMR (device master record)', term: 'dmr', wc: 'PDMLink + MPMLink', obj: 'EBOM, MBOM, process plan, specifications, label artwork', sap: 'Material master, BOM, routing', st: 'OOTB', note: 'MPMLink is a separately licensed module {V}.' },
+    { p: 'DHR (device history record)', term: 'dhr', wc: 'Not in Windchill', obj: 'As-built record per serial', sap: 'Production order, confirmations, batch / serial record; MES', st: 'Outside', note: 'Built in MES and SAP. Windchill supplies the definition it is built against.' },
+    { p: 'Post-market surveillance', term: 'pms', wc: 'Quality data plus reporting; PMS plan and report as documents {V}', obj: 'Complaint and service trends, PMS report', sap: 'Service data, analytics', st: 'Config', note: 'Needs data from complaints, service and production combined.' }
+  ],
+
+  /* ---------------------------------------------------------------------
+     CAPA STORY (Phase 3): "Brake fails to lock on one castor".
+     Each step: title, simple + expert text, parts to picture, a sample record.
+     --------------------------------------------------------------------- */
+  capa: { title: 'Brake fails to lock on one castor', steps: [
+    { k: 'Complaint intake', st: 10, term: 'complaint', parts: ['MC-CST-6000'],
+      s: `A nurse at St. Aldwyn General Hospital pressed the brake pedal before moving a patient and noticed that one wheel still turned. Nobody was on the stretcher and nobody was hurt. The service engineer replaced the wheel and wrote it up. Because the report says the device did not work as it should, it is a complaint and is logged the same day.`,
+      x: `Service order SO-2026-0412 met the complaint definition ([[iso13485]] 3.4), so the service engineer forwarded it. Intake captures device identification ([[udi]], serial), event description, patient involvement, reporter and awareness date. The awareness date starts the regulatory clocks.`,
+      rec: { id: 'CMP-2026-0231', type: 'Complaint', sys: 'Windchill quality solution', opened: '2026-05-06', owner: 'Omar Haddad (Complaint Handler)', status: 'Open → Under evaluation',
+        f: [['Customer', 'St. Aldwyn General Hospital (invented)'], ['Device', 'T-300P · serial T3P-250118 · UDI (01)09999999300017(21)T3P-250118'], ['Event', 'Foot-end right castor did not lock when the central brake was applied'], ['Patient involvement', 'None; no injury'], ['Awareness date', '2026-05-06'], ['Source', 'Service order SO-2026-0412']],
+        sig: [['Complaint Handler', 'Omar Haddad', 'Intake complete', '2026-05-06 15:20']] } },
+    { k: 'Reportability decision', st: 10, term: 'emdr', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `The first question is always: must the authorities be told? They must be told if someone was seriously hurt, or if the same fault could seriously hurt someone next time. Regulatory Affairs answers a fixed set of questions and signs the decision, whichever way it goes. Here: no injury, three other wheels held, and the red / green indicator showed the problem, so it was judged not reportable, and the decision is to be reviewed if more cases appear.`,
+      x: `US: 21 CFR 803 asks whether the device may have caused or contributed to death or serious injury, or malfunctioned in a way likely to do so on recurrence (30 calendar days; 5 work days in defined cases). EU: [[eumdr]] Art. 87 serious-incident criteria (15 / 10 / 2 days). The decision and its rationale are recorded for every complaint. Many manufacturers would treat a brake malfunction conservatively; the conclusion depends on the documented risk assessment {V}.`,
+      rec: { id: 'RPT-2026-0231', type: 'Reportability decision', sys: 'Windchill quality solution', opened: '2026-05-06', closed: '2026-05-08', owner: 'Lena Fischer (Regulatory Affairs)', status: 'Decided: not reportable; re-assess on recurrence',
+        f: [['Death or serious injury?', 'No'], ['Malfunction?', 'Yes'], ['Likely to cause serious injury if it recurs?', 'Assessed as not likely: three castors remain braked, indicator shows state, IFU requires brake check'], ['US MDR', 'Not reportable'], ['EU vigilance', 'Not a serious incident; trend monitored (Art. 88)'], ['If a patient had fallen', 'Reportable: 30 days (US), 15 days (EU)']],
+        sig: [['Regulatory Affairs', 'Lena Fischer', 'Reportability decision', '2026-05-08 11:05'], ['Quality Engineer', 'Daniel Okoro', 'Review', '2026-05-08 13:40']] } },
+    { k: 'Investigation', st: 10, term: 'dhr', parts: ['MC-CST-6000'],
+      s: `Quality looks at three things: the build record of that stretcher, the returned wheel itself, and whether similar reports exist. The build record shows the brake test passed, but only just. Under the microscope the brake cam inside the wheel is slightly too low. A search finds three more service jobs where a castor was replaced for the same reason.`,
+      x: `[[dhr]] review: castor lot NCW-L2510; OP20 holding torque 12.3 N·m against a limit of ≥ 12. Returned part (RMA-2026-0077): cam lobe height 0.4 mm below nominal, consistent with incomplete mould fill. Similar-event search by part and symptom code finds 3 service orders not previously raised as complaints: these are now logged.`,
+      rec: { id: 'CMP-2026-0231 / INV-01', type: 'Complaint investigation', sys: 'Windchill quality solution', opened: '2026-05-08', closed: '2026-05-15', owner: 'Daniel Okoro (Quality Engineer)', status: 'Complete: defect confirmed',
+        f: [['DHR finding', 'Serial T3P-250118: castor lot NCW-L2510; brake torque 12.3 N·m (marginal pass)'], ['Returned part', 'RMA-2026-0077: cam lobe 0.4 mm low'], ['Similar events', '3 service orders (2026-03 to 2026-05), all lot NCW-L2510'], ['Conclusion', 'Systematic: not a one-off']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'Investigation complete', '2026-05-15 16:10']] } },
+    { k: 'Nonconformance and MRB', st: 7, term: 'nc', parts: ['MC-CST-6000'],
+      s: `While the cause is being found, bad parts must be stopped from going any further. All castors in the warehouse are blocked and tested one by one. Six out of 600 in the newest delivery fail. A review board decides: send the delivery back, and re-test every unfinished stretcher in the factory.`,
+      x: `Containment under [[iso13485]] 8.3: stock of lot NCW-L2604 posted to blocked; 100 % torque test finds 6 of 600 below 12 N·m. [[mrb]] disposition: return to supplier. Work in progress and finished goods are re-tested on rig TR-02. Incoming inspection is tightened to 100 % until the [[scar]] closes.`,
+      rec: { id: 'NC-2026-0113', type: 'Nonconformance', sys: 'Windchill quality solution + SAP QM', opened: '2026-05-11', closed: '2026-05-18', owner: 'Daniel Okoro (Quality Engineer)', status: 'Closed: returned to supplier',
+        f: [['Item', 'MC-CST-6000 rev A, lot NCW-L2604, 600 pcs'], ['Defect', '6 pcs brake holding torque 10.8–11.9 N·m (limit ≥ 12)'], ['Containment', 'Stock blocked; 14 units in production re-tested, all pass'], ['MRB disposition', 'Return to supplier; 100 % incoming test until further notice']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'MRB disposition', '2026-05-12 10:15'], ['Manufacturing Engineer', 'Marco Rossi', 'MRB member', '2026-05-12 10:22'], ['Supplier Quality', 'Mei Tanaka', 'MRB member', '2026-05-12 10:31']] } },
+    { k: 'Root cause', st: 10, term: 'root-cause', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `"The cam is too low" is the symptom. The team keeps asking "why?" until they reach causes they can fix. They find three: the supplier repaired its mould and did not tell anyone; our drawing asked for brake strength but never gave the cam height; and our pedal linkage has no end stop, so a low cam is not pushed far enough.`,
+      x: `5-Why and fishbone analysis. Root causes: (1) supplier tool repair changed cam lobe geometry without change notification; (2) source-control drawing specified holding torque but no critical dimension on the cam, so incoming sampling could not detect drift; (3) linkage pedal travel tolerance allows under-rotation at the low end. Contributing: sample size 13 of 400 cannot detect a 1 % defect rate.`,
+      rec: { id: 'CAPA-2026-0017 / RCA', type: 'Root cause analysis', sys: 'Windchill quality solution', opened: '2026-05-12', closed: '2026-05-21', owner: 'Daniel Okoro with Asha Verma and Mei Tanaka', status: 'Root causes confirmed',
+        f: [['Cause 1', 'Supplier mould repair, not notified'], ['Cause 2', 'Drawing lacks cam height as critical characteristic'], ['Cause 3', 'No pedal travel stop on the brake linkage'], ['Method', '5-Why, fishbone, measurement of 60 castors from 3 lots']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'Root cause approved', '2026-05-21 14:00']] } },
+    { k: 'CAPA plan', st: 10, term: 'capa', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `Now the fix is planned so the problem cannot come back. Five actions: improve the wheel's brake cam, add an end stop to the pedal linkage, test every delivered wheel for now, agree with the supplier that changes must be announced, and take care of stretchers already in hospitals. The plan also says how success will be measured.`,
+      x: `[[capa]] per [[iso13485]] 8.5.2 with actions, owners, due dates and effectiveness criteria defined up front. Actions must be verified not to adversely affect the device. Management approves the plan.`,
+      rec: { id: 'CAPA-2026-0017', type: 'CAPA', sys: 'Windchill quality solution', opened: '2026-05-12', owner: 'Daniel Okoro (Quality Engineer)', status: 'Plan approved → Implementation',
+        f: [['A1', 'Design change: castor cam geometry + critical dimension (Asha Verma)'], ['A2', 'Design change: pedal travel stop on brake linkage (Asha Verma)'], ['A3', '100 % incoming brake test until SCAR closed (Daniel Okoro)'], ['A4', 'Supplier change-notification agreement (Mei Tanaka)'], ['A5', 'Field action for units with affected lots (Hannah Lindqvist)'], ['Effectiveness criteria', 'No brake-lock complaint for 3 months and 400 units; OP20 process capability Cpk ≥ 1.33']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'Plan author', '2026-05-22 09:10'], ['Management', 'Grace Whitfield', 'Plan approval', '2026-05-22 15:45']] } },
+    { k: 'Problem Report', st: 10, term: 'problem-report', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `The design is frozen, so it cannot simply be edited. The first formal step is to record what is wrong with which released parts. That record is the problem report.`,
+      x: `Windchill [[problem-report]] created from the CAPA with affected objects MC-CST-6000 A and MC-BRK-6100 A, linked to the complaint and NC. It gives design engineering an auditable entry point into change management.`,
+      rec: { id: 'PRB-2026-0058', type: 'Problem Report', sys: 'Windchill change management', opened: '2026-05-20', closed: '2026-05-26', owner: 'Asha Verma (Design Engineer)', status: 'Accepted → linked to change request',
+        f: [['Affected objects', 'MC-CST-6000 A; MC-BRK-6100 A'], ['Problem', 'Brake cam may not fully engage; no critical dimension; no pedal travel stop'], ['Linked records', 'CAPA-2026-0017, CMP-2026-0231, NC-2026-0113']],
+        sig: [['Change Admin', 'Priya Nair', 'Accepted', '2026-05-26 09:30']] } },
+    { k: 'Change Request', st: 10, term: 'change-request', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `Next comes the written case for the change: what should change, and what else it touches — tests, the risk file, stock, the factory, hospitals, the label. A board with people from every department reads it and decides. They approve it.`,
+      x: `[[change-request]] with impact analysis: repeat VT-012 / VT-014; update [[dfmea]] and risk management report; no new [[udi-di]] because labeled characteristics and intended performance are unchanged (rationale recorded) {V}; 240 revision A castors in stock to be returned; MBOM, process plan, service kit and bulletin affected. [[ccb]] decision: approved, full track.`,
+      rec: { id: 'CR-2026-0044', type: 'Change Request', sys: 'Windchill change management', opened: '2026-05-26', closed: '2026-06-02', owner: 'Asha Verma (Design Engineer)', status: 'Approved by CCB',
+        f: [['Proposed change', 'Castor rev B: new cam geometry, cam height as critical characteristic. Brake linkage rev B: pedal travel stop'], ['Risk file', 'DFMEA DF-021, DF-022 to be re-scored'], ['V&V', 'Repeat VT-012 and VT-014 on rev B'], ['Regulatory', 'No new UDI-DI; no new submission; technical file updated'], ['Stock', '240 pcs rev A: return to supplier'], ['Field', 'Service bulletin for units with lots NCW-L2510 / L2604']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'CCB approval', '2026-06-02 10:40'], ['Regulatory Affairs', 'Lena Fischer', 'CCB approval', '2026-06-02 10:52'], ['Manufacturing Engineer', 'Marco Rossi', 'CCB review', '2026-06-02 10:55'], ['Change Admin', 'Priya Nair', 'CCB chair', '2026-06-02 11:00']] } },
+    { k: 'Change Notice', st: 10, term: 'change-notice', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `The approved change becomes a work order with a task for each person: update the wheel drawing, update the brake linkage, update the factory steps, update the spare-part kit, update the risk file. When every task is done and checked, the new versions are released together with signatures.`,
+      x: `[[change-notice]] with five [[change-task]]s; each has affected (rev A) and resulting (rev B) objects, an assignee and a reviewer. Release of the notice promotes resulting objects to Released, sets [[effectivity]] and triggers [[esi]].`,
+      rec: { id: 'CN-2026-0039', type: 'Change Notice', sys: 'Windchill change management', opened: '2026-06-03', closed: '2026-07-03', owner: 'Priya Nair (Change Admin)', status: 'Released',
+        f: [['CT-1', 'MC-CST-6000 A → B: drawing, purchase specification (Asha Verma)'], ['CT-2', 'MC-BRK-6100 A → B: travel stop (Asha Verma)'], ['CT-3', 'MBOM and process plan: OP20 limit raised to ≥ 13 N·m, cam height check at incoming (Marco Rossi)'], ['CT-4', 'Service kit MC-KIT-6000 rev B and bulletin SB-T300-004 (Hannah Lindqvist)'], ['CT-5', 'Risk file and DFMEA update (Daniel Okoro)']],
+        sig: [['Design Engineer', 'Asha Verma', 'Tasks complete', '2026-06-29 17:05'], ['Quality Engineer', 'Daniel Okoro', 'Approval', '2026-07-02 11:20'], ['Regulatory Affairs', 'Lena Fischer', 'Approval', '2026-07-02 14:02'], ['Change Admin', 'Priya Nair', 'Release', '2026-07-03 09:15']] } },
+    { k: 'Design and risk file update', st: 4, term: 'risk-file', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `The new wheel and linkage are tested exactly like the originals: full load on a slope, then 20 000 pedal presses, then the slope again. They pass with room to spare. The list of risks is updated to show the danger is now less likely and easier to catch.`,
+      x: `Design change per [[iso13485]] 7.3.9: verification repeated on revision B; [[dfmea]] DF-021 re-scored S9 × O2 × D2 = 36 (was 108); DF-022 S9 × O1 × D2 = 18 (was 72). Risk management report revised; benefit-risk conclusion unchanged. New [[baseline]] taken.`,
+      rec: { id: 'DOC-VER-0112 B / DOC-RMR-0090 C', type: 'Verification report and risk management report', sys: 'Windchill (WTDocument)', opened: '2026-06-10', closed: '2026-06-30', owner: 'Asha Verma / Daniel Okoro', status: 'Released with CN-2026-0039',
+        f: [['VT-012 on rev B', 'Pass: 0 mm creep; holding torque 15.2–16.4 N·m'], ['VT-014 on rev B', 'Pass after 20 000 cycles'], ['DFMEA DF-021', 'RPN 108 → 36'], ['DFMEA DF-022', 'RPN 72 → 18'], ['Baseline', 'BL-0019 "T-300 rev B brake"']],
+        sig: [['Design Engineer', 'Asha Verma', 'Author', '2026-06-26 16:30'], ['Quality Engineer', 'Daniel Okoro', 'Approval', '2026-06-30 10:10']] } },
+    { k: 'MBOM and SAP effectivity', st: 6, term: 'effectivity', parts: ['MC-CST-6000', 'MC-BRK-6100'],
+      s: `The factory must switch to the new parts at a clear point. The change says: from serial number T3P-260400 onwards, only the new wheel and linkage are used. Windchill sends this to SAP, old stock is sent back, and the old wheel can no longer be supplied as a spare.`,
+      x: `Serial [[effectivity]] T3P-260400 (first build 2026-07-13). [[esi]] publishes revision B parts, updated BOM and routing under SAP change number 500000391. Stock disposition: revision A returned. [[supersession]]: A → B for service; kit MC-KIT-6000 revision B.`,
+      rec: { id: 'TX-001377 / SAP 500000391', type: 'ERP publication and change master', sys: 'Windchill ESI → SAP', opened: '2026-07-03', closed: '2026-07-13', owner: 'Marco Rossi (Manufacturing Engineer)', status: 'Effective',
+        f: [['Effectivity', 'From serial T3P-260400'], ['Published', 'MC-CST-6000 B, MC-BRK-6100 B, BOM, routing (OP20 limit ≥ 13 N·m)'], ['Stock', '240 pcs rev A returned; 0 on hand at cut-in'], ['Supersession', 'MC-CST-6000 A superseded by B for spares']],
+        sig: [['Manufacturing Engineer', 'Marco Rossi', 'Cut-in confirmed', '2026-07-13 08:05'], ['Quality Engineer', 'Daniel Okoro', 'First-article approval', '2026-07-13 11:30']] } },
+    { k: 'Supplier SCAR', st: 7, term: 'scar', parts: ['MC-CST-6000'],
+      s: `The supplier is formally asked to find and fix its own cause. Norvale replaces the worn mould insert, adds a camera check of every cam, and agrees to announce any future process change in advance. Three good deliveries in a row prove it works.`,
+      x: `[[scar]] with 8D response: containment, root cause (mould insert wear after repair), corrective action (new insert, 100 % vision check of cam height added to supplier control plan), preventive action (change-notification clause in quality agreement). Verified on three consecutive lots at 100 % inspection, then closed; [[avl]] status stays Preferred.`,
+      rec: { id: 'SCAR-2026-0009', type: 'Supplier corrective action request', sys: 'Windchill quality solution', opened: '2026-05-14', closed: '2026-08-21', owner: 'Mei Tanaka (Supplier Quality)', status: 'Closed: verified',
+        f: [['Supplier', 'Norvale Castor Works (invented)'], ['Supplier root cause', 'Mould insert wear after tool repair'], ['Supplier action', 'New insert; 100 % vision check of cam height'], ['Agreement', 'Change notification clause signed 2026-06-18'], ['Verification', 'Lots NCW-L2607, L2608, L2609: 0 defects in 1 800 pcs']],
+        sig: [['Supplier Quality', 'Mei Tanaka', 'Verified and closed', '2026-08-21 13:25'], ['Quality Engineer', 'Daniel Okoro', 'Approval', '2026-08-21 15:00']] } },
+    { k: 'Service bulletin / field action', st: 9, term: 'service-bulletin', parts: ['MC-CST-6000'],
+      s: `What about stretchers already in hospitals? The records show exactly which 212 units got wheels from the two suspect deliveries. A risk assessment decides how urgent it is. Here a service bulletin is enough: engineers visit, test the brakes and fit new wheels. Had injuries been likely, it would have been a formal safety recall with letters to every hospital and a report to the authorities.`,
+      x: `Health hazard evaluation under [[iso14971]]: probability of harm low, detection by user likely → [[service-bulletin]], not [[fsca]]. Affected units identified through [[dhr]] genealogy (lots NCW-L2510, NCW-L2604) and the [[installed-base]]. Completion tracked per serial; as-maintained configuration updated.`,
+      rec: { id: 'SB-T300-004', type: 'Service bulletin', sys: 'Windchill (document) + SAP service', opened: '2026-07-20', closed: '2026-09-30', owner: 'Hannah Lindqvist (Service Engineer)', status: 'Complete: 212 of 212 units',
+        f: [['Decision record', 'HHE-2026-004: bulletin, not FSCA'], ['Affected', '212 units, serials built with castor lots NCW-L2510 / NCW-L2604'], ['Action', 'Test brake torque; replace all four castors with kit MC-KIT-6000 rev B'], ['Progress', '212 / 212 done by 2026-09-30']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'Field action decision', '2026-07-16 10:00'], ['Regulatory Affairs', 'Lena Fischer', 'Field action decision', '2026-07-16 10:20'], ['Management', 'Grace Whitfield', 'Approval', '2026-07-17 09:05']] } },
+    { k: 'Effectiveness check', st: 10, term: 'effectiveness-check', parts: ['MC-CST-6000'],
+      s: `Doing the actions is not the end. Three months later the team checks the numbers they promised at the start: no new brake complaints, more than 400 new stretchers built, and the factory brake test now passes with a wide margin. The fix worked.`,
+      x: `Effectiveness verified against the pre-defined criteria: 0 brake-lock complaints in 3 months across 412 units; OP20 Cpk 1.71; incoming inspection returned to sampling after SCAR closure.`,
+      rec: { id: 'CAPA-2026-0017 / EFF', type: 'Effectiveness check', sys: 'Windchill quality solution', opened: '2026-07-13', closed: '2026-10-19', owner: 'Daniel Okoro (Quality Engineer)', status: 'Effective',
+        f: [['Complaints since cut-in', '0'], ['Units built with rev B', '412'], ['OP20 brake torque', 'Mean 15.8 N·m, Cpk 1.71'], ['Result', 'All criteria met']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'Effectiveness confirmed', '2026-10-19 14:15']] } },
+    { k: 'Closure', st: 10, term: 'pms', parts: [],
+      s: `Everything is closed in order: the CAPA, then the complaint, with a reply to the hospital explaining what was found and done. The story is added to the company's safety monitoring and reported to management, so the lesson is kept for the next product.`,
+      x: `CAPA closed with management approval; complaint closed with customer response; [[pms]] trend and occurrence estimates in the [[risk-file]] updated; input to management review. All records remain linked: complaint → CAPA → change → effectivity → field action.`,
+      rec: { id: 'CAPA-2026-0017 / CMP-2026-0231', type: 'Closure', sys: 'Windchill quality solution', opened: '2026-10-19', closed: '2026-10-26', owner: 'Daniel Okoro / Omar Haddad', status: 'Closed',
+        f: [['CAPA closed', '2026-10-23'], ['Complaint closed', '2026-10-26, reply sent to the hospital'], ['PMS', 'Brake complaints per 1 000 units: 4.1 → 0'], ['Lesson learned', 'Critical dimensions on all source-control drawings of safety-critical bought parts']],
+        sig: [['Quality Engineer', 'Daniel Okoro', 'CAPA closure', '2026-10-23 10:30'], ['Management', 'Grace Whitfield', 'CAPA closure approval', '2026-10-23 16:10'], ['Complaint Handler', 'Omar Haddad', 'Complaint closure', '2026-10-26 09:45']] } }
+  ] },
+
+  /* ---------------------------------------------------------------------
      MINI-FLOWS: two short animated walkthroughs (Phase 2).
      --------------------------------------------------------------------- */
   miniFlows: {

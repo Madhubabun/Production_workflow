@@ -12,24 +12,21 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 
 ## Features
 
-**Available now (Phases 1 and 2)**
-
 - "Start here" welcome with a 30-second explanation
-- Animated journey map of the 10 stages, with five parallel lanes (ProjectLink, Supplier Management, Risk, Quality, Regulatory)
+- **Play the journey**: a guided tour that walks through all 10 stages with narration, while the 3D stretcher changes its look. Play / pause, previous / next, speed, jump to stage, progress bar
+- Animated journey map of the 10 stages. Underneath, five teams work alongside (teamwork, suppliers, safety risks, quality checks, legal approval), each with a plain-language label per stage and example cards
 - 3D stretcher built from Three.js primitives: orbit, zoom, explode view, hover tooltips, click a part for details, optional powered drive module
 - Lifecycle looks for the 3D model: idea sketch → Creo CAD → managed in Windchill → released → plant bench → packed with UDI label → in hospital → service
 - Animated data packets between Creo, Windchill, SAP, MES, supplier and service
-- Hover and click on everything: each term has a one-line tooltip and a drawer with Simple / Expert / In our stretcher / Related tabs
+- Hover and click on everything: each term has a one-line tooltip and a drawer with Simple / Expert / In our stretcher / Related tabs. "In our stretcher" shows a 3D picture with the relevant parts highlighted
 - Global Simple / Expert switch, light / dark mode, keyboard accessible
-- Full stage pages for stages 1–4: purpose, what happens, Windchill objects and states, sample tables (requirements, hazards, DFMEA, EBOM, alternates vs substitutes, AML, V&V, promotion request, e-signatures), RACI with Part 11 signature markers, audit evidence, pitfalls, best practices
-- Full stage pages for stages 5–10: MBOM and process plan, ERP handoff with Windchill-to-SAP mapping, production with procurement records and a DHR extract, packaging / labeling / UDI, service (spares, warranty, RMA, refurbishment, obsolescence, end of life) and the feedback loop
+- Full pages for all 10 stages: purpose, what happens, Windchill objects and states, sample tables, RACI with Part 11 signature markers, audit evidence, data flow, pitfalls, best practices
 - Animated mini-journeys: procurement (MRP → PR → PO → supplier → goods receipt → incoming inspection → stock) and service (field issue → service order → spare part → repair → record → feedback)
-- Follow a part: pick any part and see its digital thread light up, from user need and hazard through CAD, EBOM, test, MBOM, SAP, AML / AVL, purchase order, inspection, DHR, UDI, service kit and CAPA history, with alternates and substitutes explained
-- Parts and BOM page, searchable A–Z glossary (143 terms so far)
-
-**Planned**
-
-- Phase 3: brake complaint → CAPA story, role views, QMS module map, 150+ glossary terms, guided "Play the journey" tour
+- **Follow a part**: pick any part and see its 16-step digital thread, with attributes, approved manufacturers, alternates and substitutes
+- **CAPA story**: "Brake fails to lock on one castor" in 15 steps from complaint intake to closure, with a sample record (ID, dates, owner, status, signatures) at every step
+- **Roles**: choose one of 11 roles to see its tasks, approvals, screens and deliverables, a full RACI table, and which approvals need Part 11 electronic signatures. The choice also highlights that role across the site
+- **Module map**: QMS process | Windchill module | key objects | SAP counterpart | how it is delivered, with VERIFY badges
+- Parts and BOM page, searchable A–Z glossary with 160 terms
 
 ## Structure
 
@@ -37,7 +34,7 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 | --- | --- |
 | `index.html` | Page shell |
 | `styles.css` | Design tokens (light / dark) and all styling |
-| `data.js` | The single data object `window.MD`: product, roles, systems, flows, lanes, stages, parts, mini-flows, part threads |
+| `data.js` | The single data object `window.MD`: product, roles, systems, flows, lanes, stages, parts, mini-flows, part threads, tour narration, role info, module map, CAPA story |
 | `data-terms.js` | Glossary terms, added to `MD.terms` |
 | `stretcher3d.js` | Procedural 3D stretcher and lifecycle looks |
 | `app.js` | Renders the UI from the data: map, drawer, pages, routing |
