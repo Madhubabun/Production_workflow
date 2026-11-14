@@ -1174,6 +1174,176 @@ window.MD = {
      LANE INFO (Phase 3): plain-language name, one-line meaning, an everyday
      picture, and a 2-3 word label per stage for the map cells.
      --------------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------
+     STORY MODE (Phase 4): the stretcher's life as a 10-page picture book.
+     No acronyms. look = which 3D look the picture uses.
+     --------------------------------------------------------------------- */
+  story: { name: 'Stella', pages: [
+    { st: 1, look: 'idea', h: 'Stella is only an idea', t: 'This is Stella. Right now she is just a sketch on paper. Nurses and porters tell the makers what they need: carry a heavy patient, stay still when it matters, be easy to push. The makers also write down everything that could go wrong, so it can be prevented.' },
+    { st: 2, look: 'creo', h: 'Stella is drawn in 3D', t: 'Engineers build Stella on a computer, piece by piece, like a 3D jigsaw puzzle. Every time they save their work, the older version is kept too, so nothing is ever lost.' },
+    { st: 3, look: 'windchill', h: 'Every piece gets a name tag', t: 'Each piece of Stella gets its own number and goes onto one official list. Now everybody in the company knows exactly what she is made of, and who looks after each piece.' },
+    { st: 4, look: 'released', h: 'Stella passes her exams', t: 'Stella is tested hard: carrying a heavy load, holding still on a slope, being used thousands of times. She passes. The examiners sign, and her design is locked so nobody can change it quietly.' },
+    { st: 5, look: 'plant', h: 'The factory writes her recipe', t: 'The factory plans how to build Stella: which workbench does which step, in what order, with which tools. It is a recipe that anyone in the factory can follow the same way every time.' },
+    { st: 6, look: 'plant', h: 'The shopping list is sent', t: 'The recipe travels to the factory\'s ordering system. It works out what to buy and when, so the right parts are there on the right day. Nobody has to type anything twice.' },
+    { st: 7, look: 'plant', h: 'Stella is built', t: 'Parts arrive and are checked at the door. Workers put Stella together bench by bench. Every step is written in her diary: who built her, with which parts, and which tests she passed.' },
+    { st: 8, look: 'packaged', h: 'Stella gets her passport', t: 'Stella receives a label with a code that belongs to her alone, like a passport number. She is packed in a box with her instruction booklet and sent to a hospital.' },
+    { st: 9, look: 'hospital', h: 'Stella goes to work', t: 'Every day Stella carries patients safely around the hospital. Once a year she gets a check-up, and worn parts are replaced with approved new ones.' },
+    { st: 10, look: 'service', h: 'Stella gets sick, and better', t: 'One day a wheel brake stops locking. The makers find out why. They repair Stella, improve the design, and fix every one of her sisters too. That is how Stella and her family keep patients safe.' }
+  ] },
+
+  /* ---------------------------------------------------------------------
+     RESTAURANT PICTURE (Phase 4): one everyday comparison used everywhere.
+     A restaurant creates a new dish and serves it safely.
+     --------------------------------------------------------------------- */
+  kitchen: {
+    intro: 'One picture to hold on to: think of a restaurant putting a new dish on the menu. The stretcher is the dish. Everything a medical device company does has a twin in that restaurant.',
+    stages: [
+      'Guests say what they would like to eat. The chef writes down what the dish must be (portion size, no nuts) and what could make a guest ill.',
+      'The chef creates the recipe in the test kitchen. Every version is written in the recipe book, so an earlier one can always be found.',
+      'The recipe gets its exact ingredients list: every item, how much of it, and which brands are allowed.',
+      'A tasting panel tries the dish. The head chef and the health officer sign, and the recipe is locked. A change now needs a new edition.',
+      'The recipe is rewritten for the kitchen line: which station does what, in which order, with which tools.',
+      'The locked recipe is sent to the restaurant\'s ordering system, so it knows what to buy and when to cook.',
+      'Ingredients arrive and are checked at the back door. Cooks prepare the dish station by station and note who cooked what from which delivery.',
+      'The dish is boxed and labelled: what it is, when it was made, and its own order number. The menu is registered with the food authority.',
+      'The guest eats. The restaurant stays in touch, replaces anything that is wrong, and keeps a record.',
+      'A guest complains. The restaurant finds the real cause, fixes the recipe for good, and warns everyone who received the same batch.' ],
+    lanes: {
+      projectlink: 'The planning board on the kitchen wall: who does what before opening night.',
+      suma: 'The list of trusted shops and approved brands for every ingredient.',
+      risk: 'Allergy and food-safety thinking: what could make a guest ill, and how to prevent it.',
+      quality: 'The head chef tasting, checking and signing at every step.',
+      regulatory: 'The health inspector and the licences needed to open the doors.' },
+    terms: {
+      creo: 'The test kitchen where the chef creates the dish.', windchill: 'The master recipe book, kept safe in the office. If it is not in the book, it is not official.',
+      sap: 'The restaurant\'s ordering and stock system.', erp: 'The ordering and stock system.', mes: 'The screens above each kitchen station that show the next step.',
+      plm: 'Looking after a recipe for its whole life, from idea to removal from the menu.', pdm: 'The safe that stores every version of every recipe.',
+      ebom: 'The ingredients list as the chef wrote it.', mbom: 'The same ingredients, regrouped by kitchen station.', sbom: 'The list of things a waiter may replace at the table.', bom: 'The ingredients list.',
+      wtpart: 'One ingredient card in the recipe book.', 'cad-document': 'The chef\'s picture of how the dish is put together.', drawing: 'The plating diagram with exact measurements.',
+      revision: 'A new edition of the recipe: first edition, second edition.', iteration: 'The chef\'s drafts while still experimenting.', 'lifecycle-state': 'The stamp on the recipe: draft, being tasted, approved, retired.',
+      baseline: 'A photo of the whole recipe book on opening day.', 'promotion-request': 'Asking the head chef to approve the recipe for the menu.', esign: 'The head chef\'s signature on the recipe.',
+      'change-request': 'A written proposal to change the recipe.', 'change-notice': 'The instruction to all cooks: "From Monday, we cook it the new way."', ccb: 'The weekly meeting of chef, manager and buyer that decides on recipe changes.',
+      effectivity: '"The new recipe applies from Monday\'s dinner service."', aml: 'The approved brands for an ingredient.', avl: 'The approved shops where it may be bought.',
+      alternate: 'Another brand of the same butter: fine in every dish.', substitute: 'Margarine instead of butter: allowed only in this one cake.',
+      'process-plan': 'The cooking method, station by station.', operation: 'One step of the method.', 'work-center': 'A kitchen station, such as the grill.', station: 'A cook\'s own counter.', 'work-instruction': 'The picture card above the station.',
+      mrp: 'Checking the bookings against the fridge and writing the shopping list.', po: 'The order placed with the shop.', 'goods-receipt': 'Signing for the delivery at the back door.', 'inspection-lot': 'Checking a sample of the delivery before it goes in the fridge.',
+      dhr: 'The kitchen log for one order: who cooked it, from which delivery.', dmr: 'The complete master recipe, including how to plate and box it.', dhf: 'The chef\'s diary of how the dish was developed and tested.',
+      udi: 'The dish code plus the order number on the box.', traceability: 'Knowing which delivery of chicken went onto which plate.',
+      complaint: 'A guest says the food was wrong.', capa: 'Fixing the real cause so it never happens again, not just replacing one plate.', nc: 'An ingredient that fails the check and is set aside.', mrb: 'Chef and manager deciding what to do with it.', scar: 'Telling the supplier to fix the problem at their end.',
+      hazard: 'Something that could make a guest ill, such as an allergen.', 'risk-control': 'Separate chopping boards, and an allergen warning on the menu.', dfmea: 'Asking "what could go wrong with this recipe?"', pfmea: 'Asking "what could go wrong in the kitchen?"',
+      verification: 'Checking the dish against the recipe.', validation: 'Real guests trying it and being happy.', 'user-need': 'What the guest asks for.', 'design-input': 'The measurable version: 300 grams, no nuts, served hot.',
+      fda: 'The health inspector.', 'notified-body': 'An independent inspector who checks the kitchen before it may open.', iso13485: 'The rulebook for running a clean, safe kitchen.', qmsr: 'The law that says: follow the kitchen rulebook.', eumdr: 'The food law of the region.',
+      fsca: 'Recalling a batch and telling every guest who got it.', 'service-bulletin': 'A note to all waiters about what to check.', ifu: 'The reheating instructions on the box.', kit: 'A meal kit: everything for one dish in one bag.' }
+  },
+
+  /* ---------------------------------------------------------------------
+     A DAY IN THE LIFE (Phase 4): per role, [time, title, what happens, screen, signs?].
+     --------------------------------------------------------------------- */
+  days: {
+    DE: [['08:30', 'Check out the brake linkage', 'Asha opens Creo, takes the brake linkage out of the vault and adds the new pedal travel stop.', 'Creo with the Windchill workspace', false],
+         ['11:00', 'Check in and update the parts list', 'She saves the model back. Windchill keeps the old version and updates the engineering parts list.', 'Windchill part structure browser', false],
+         ['14:00', 'Complete a change task', 'Her task in the change notice is finished: castor drawing revised from A to B. She marks it complete.', 'Windchill task list: change task', true],
+         ['16:00', 'Review test results', 'The brake test on the new design passed. She attaches the report to the part.', 'Windchill document page', false]],
+    ME: [['07:45', 'Walk the line', 'Marco checks bench B1 with the operators: the new castor fits the fixture.', 'Shop floor', false],
+         ['09:30', 'Update the factory parts list', 'He pulls the revised castor from the engineering list into the factory list for Plant 1000.', 'MPMLink BOM Transformer', false],
+         ['13:00', 'Change a build step', 'Operation OP20 gets a higher brake-test limit. The work instruction updates with it.', 'Process plan browser', false],
+         ['15:30', 'Set the switch-over point', 'He proposes: new castor from serial T3P-260400. Quality approves.', 'Change notice: effectivity', true]],
+    QE: [['08:00', 'Review yesterday\'s build records', 'Daniel checks the records of 12 finished stretchers and releases them for shipment.', 'MES build record review', true],
+         ['10:00', 'Material review board', 'Six castors failed the incoming test. The board decides: return to supplier.', 'Nonconformance record', true],
+         ['13:30', 'Approve a design change', 'He reads the change, the test evidence and the risk update, then signs with his password.', 'Windchill task list: approval', true],
+         ['16:00', 'CAPA follow-up', 'Three months of data show no new brake complaints. He records the effectiveness check.', 'CAPA record', true]],
+    RA: [['09:00', 'Reportability decision', 'Lena answers the fixed questions for a new complaint and signs the decision.', 'Complaint: reportability questionnaire', true],
+         ['11:00', 'Change impact', 'A design change asks: new device code needed? She records why not.', 'Change request: regulatory impact', true],
+         ['14:00', 'Register a device', 'She submits the device record for a new variant to the authority database.', 'UDI data set and authority portal', false],
+         ['16:30', 'Label review', 'New label artwork for the EU pack: she checks symbols and language.', 'Windchill document review task', true]],
+    SC: [['08:15', 'Morning planning list', 'Tom sees that castors are short for next month\'s builds.', 'SAP planning list', false],
+         ['09:00', 'Place the order', 'He turns the request into a purchase order to the approved supplier.', 'SAP purchase order', false],
+         ['13:00', 'Chase a late delivery', 'Battery packs are a week late. He checks the approved alternative source.', 'Windchill: approved vendors of a part', false],
+         ['15:00', 'Last-time buy', 'A chip is being discontinued. He orders enough for seven years of spares.', 'SAP purchase order', false]],
+    SQ: [['08:30', 'Incoming results', 'Mei reviews last week\'s inspection results by supplier.', 'SAP quality: vendor evaluation', false],
+         ['10:30', 'Supplier corrective action', 'She sends the castor supplier a formal request to find and fix the cause.', 'Supplier corrective action record', true],
+         ['14:00', 'Qualify a second source', 'A new castor maker sent samples and test reports. She adds them as "Approved".', 'Windchill Supplier Management', true],
+         ['16:00', 'Verify the fix', 'Three good deliveries in a row: she closes the supplier action.', 'Supplier corrective action record', true]],
+    CA: [['09:00', 'Prepare the change board', 'Priya collects this week\'s change requests and their impact answers.', 'Windchill change requests', false],
+         ['10:00', 'Run the change board', 'The board approves the castor change. She records the decision.', 'Change request: board review', true],
+         ['13:00', 'Release a change notice', 'All tasks are done and signed. She releases it, and the new revisions become official.', 'Change notice', true],
+         ['13:20', 'Watch the hand-over to SAP', 'One transfer failed because a work centre was missing. She gets it fixed and sends it again.', 'Enterprise Systems Transaction Log', false]],
+    PR: [['06:00', 'Start of shift', 'Carlos scans his badge at bench B1. The screen shows the first step and its pictures.', 'MES operation screen', false],
+         ['06:20', 'Fit the castors', 'He scans the castor lot, tightens each stem, and the torque wrench records the values.', 'MES data collection', false],
+         ['06:40', 'Brake test', 'Each castor is tested on the rig. The screen will not continue without four passes.', 'MES data collection', false],
+         ['11:00', 'Report a problem', 'A side rail is scratched. He tags it and records it so it cannot be used by mistake.', 'Nonconformance entry', false]],
+    SE: [['08:00', 'Today\'s jobs', 'Hannah sees three hospital visits on her phone.', 'SAP service order (mobile)', false],
+         ['09:30', 'Repair on the ward', 'A brake does not lock. She fits a castor service kit and tests the brake.', 'Service manual and spare kit list', false],
+         ['10:15', 'Write it up', 'She records what she found, the part and lot fitted, and the test result.', 'SAP service order (mobile)', false],
+         ['14:00', 'Service bulletin', 'She checks two more stretchers named in a bulletin and marks them done.', 'Service bulletin and installed base', false]],
+    CH: [['08:30', 'New reports', 'Omar reads overnight service reports. One describes a brake that did not lock: that is a complaint.', 'Complaint intake', false],
+         ['09:00', 'Log the complaint', 'He records the hospital, the serial number, what happened and whether anyone was hurt.', 'Complaint record', true],
+         ['11:00', 'Look for a pattern', 'A search finds three similar reports this spring. He links them.', 'Complaint search', false],
+         ['15:00', 'Reply to the hospital', 'When the investigation closes, he writes to the hospital with what was found and done.', 'Complaint record: closure', true]],
+    MG: [['09:00', 'Approve a plan', 'Grace reads the corrective action plan for the brake problem and approves it.', 'Windchill task list: approval', true],
+         ['11:00', 'Project gate', 'She reviews whether the design freeze deliverables are all released.', 'ProjectLink dashboard', false],
+         ['14:00', 'Field action decision', 'With Quality and Regulatory she decides how to handle stretchers already in hospitals.', 'Field action decision record', true],
+         ['16:00', 'Management review', 'Complaints, audits and trends for the quarter: she decides where to invest.', 'Quality dashboard', false]]
+  },
+
+  /* ---------------------------------------------------------------------
+     HOW EACH BOM IS MADE (Phase 4). A BOM is a parts list. The same parts
+     appear in several lists, each arranged for a different job.
+     tree rows: [indent level, number, name, tag]  tag: '' same part,
+     'new' = added in this list, 'group' = grouping made for this list.
+     --------------------------------------------------------------------- */
+  boms: {
+    intro: 'A BOM (bill of materials) is simply a parts list. The stretcher has one set of parts but several lists, because each team needs the parts arranged for its own job. The designer asks "what is it made of?", the factory asks "in what order do I build it?", and the service engineer asks "what can I replace?".',
+    order: ['ebom', 'mbom', 'sapbom', 'sbom', 'pbom'],
+    list: {
+      ebom: { name: 'Engineering BOM (EBOM)', term: 'ebom', c: 3, st: 3, q: 'What is it made of?', pics: [{ ids: [], ex: 0.6, cap: 'Exploded view: every part you see is one line in the engineering list.' }], who: 'Design Engineer', sys: 'Windchill, Design view',
+        plain: 'The parts list as the designers think about the stretcher: grouped by what each part does.',
+        kitchen: 'The ingredients list as the chef wrote it.',
+        from: 'The 3D model in Creo.',
+        how: ['The designer saves the Creo assembly into Windchill (check-in).', 'Windchill reads the assembly and creates one part record for each component, with the quantity counted automatically.', 'The designer adds items that are not in the 3D model: labels, firmware, grease.', 'Each line is marked make or buy, and approved makers are linked to bought parts.', 'Options are added (manual or powered), then the list is reviewed, signed and released.'],
+        parts: ['MC-FRM-1000', 'MC-CST-6000', 'MC-BRK-6100'],
+        tree: [[0, 'MC-STR-3000', 'TransPort T-300 stretcher', ''], [1, 'MC-FRM-1000', 'Base frame weldment', ''], [1, 'MC-FRM-1100', 'Litter frame with deck', ''], [1, 'MC-HYD-2000', 'Hydraulic lift column ×2', ''], [1, 'MC-HYD-2100', 'Foot pump pedal', ''], [1, 'MC-BKR-3100', 'Backrest panel', ''], [1, 'MC-GSP-3200', 'Backrest gas spring', ''], [1, 'MC-RAL-4000', 'Side rail ×2', ''], [1, 'MC-IVP-4500', 'IV pole', ''], [1, 'MC-MAT-5000', 'Mattress', ''], [1, 'MC-CST-6000', 'Castor with brake ×4', ''], [1, 'MC-BRK-6100', 'Central brake linkage', ''], [1, 'MC-HDL-7000', 'Push handles', ''], [1, 'MC-DRV-8000', 'Powered drive module (option)', ''], [1, 'MC-LBL-9000', 'Label set', '']] },
+      mbom: { name: 'Manufacturing BOM (MBOM)', term: 'mbom', c: 5, st: 5, q: 'In what order do I build it?', pics: [{ ids: ['MC-FRM-1000', 'MC-CST-6000', 'MC-BRK-6100'], cap: 'Build group 1: Chassis complete' }, { ids: ['MC-HYD-2000', 'MC-HYD-2100'], cap: 'Build group 2: Lift unit' }, { ids: ['MC-FRM-1100', 'MC-BKR-3100', 'MC-GSP-3200', 'MC-RAL-4000', 'MC-IVP-4500', 'MC-MAT-5000', 'MC-HDL-7000'], cap: 'Build group 3: Patient surface' }], who: 'Manufacturing Engineer', sys: 'Windchill MPMLink, Manufacturing view, per plant',
+        plain: 'The same parts regrouped the way the factory builds: first the chassis, then the lift, then the patient surface. Factory-only items are added.',
+        kitchen: 'The same ingredients, regrouped by kitchen station.',
+        from: 'The released EBOM.',
+        how: ['The manufacturing engineer opens the EBOM and the empty MBOM side by side (BOM Transformer).', 'Parts are carried across and placed under new build groups, such as "Chassis complete".', 'Factory-only items are added: thread-lock, oil, the packaging set.', 'Windchill checks that every EBOM part has been used, so nothing is forgotten.', 'Each line is linked to the build step and bench where it is fitted, then the list is released for the plant.'],
+        parts: ['MC-FRM-1000', 'MC-CST-6000', 'MC-BRK-6100'],
+        tree: [[0, 'MC-STR-3000', 'TransPort T-300 stretcher (Plant 1000)', ''], [1, 'MC-MFG-0100', 'Chassis complete', 'group'], [2, 'MC-FRM-1000', 'Base frame weldment', ''], [2, 'MC-CST-6000', 'Castor with brake ×4', ''], [2, 'MC-BRK-6100', 'Central brake linkage', ''], [2, 'MC-PHN-0110', 'Brake fastener set', 'new'], [2, 'MC-CON-0007', 'Thread-lock 0.5 ml', 'new'], [1, 'MC-MFG-0200', 'Lift unit', 'group'], [2, 'MC-HYD-2000', 'Hydraulic lift column ×2', ''], [2, 'MC-HYD-2100', 'Foot pump pedal', ''], [1, 'MC-MFG-0300', 'Patient surface', 'group'], [2, '…', 'Litter frame, backrest, gas spring, rails, IV pole, mattress, handles', ''], [1, 'MC-DRV-8000', 'Powered drive module (option)', ''], [1, 'MC-LBL-9000', 'Label set', ''], [1, 'MC-PKG-9100', 'Packaging set with IFU', 'new']] },
+      sapbom: { name: 'SAP production BOM', term: 'bom', c: 6, st: 6, q: 'What do I need to order and issue?', who: 'Created automatically; enriched by Supply Chain', sys: 'SAP S/4HANA, plant 1000',
+        plain: 'A copy of the MBOM inside the business system, so it can plan purchases and issue parts to production orders.',
+        kitchen: 'The station list typed into the ordering system, so it knows what to buy.',
+        from: 'The released MBOM, sent by Windchill.',
+        how: ['A change notice is released in Windchill.', 'The connector sends the parts first, then the MBOM, then the build steps.', 'SAP creates the BOM with item numbers and a valid-from date.', 'Nobody types it by hand. If a transfer fails, the cause is fixed and it is sent again.', 'SAP adds what only it knows: stock locations, planning rules, prices.'],
+        parts: [],
+        tree: [[0, 'MC-STR-3000', 'Material MC-STR-3000, BOM usage 1, valid from 2025-07-01', ''], [1, '0010', 'MC-MFG-0100 Chassis complete', ''], [1, '0020', 'MC-MFG-0200 Lift unit', ''], [1, '0030', 'MC-MFG-0300 Patient surface', ''], [1, '0040', 'MC-DRV-8000 Powered drive module', ''], [1, '0050', 'MC-LBL-9000 Label set', ''], [1, '0060', 'MC-PKG-9100 Packaging set', '']] },
+      sbom: { name: 'Service BOM (SBOM)', term: 'sbom', c: 9, st: 9, q: 'What can I replace in the hospital?', pics: [{ ids: ['MC-CST-6000'], cap: 'Castor service kit' }, { ids: ['MC-GSP-3200'], cap: 'Gas spring kit' }, { ids: ['MC-MAT-5000'], cap: 'Mattress, a single spare part' }], who: 'Service Engineer with Design Engineer', sys: 'Windchill, Service view',
+        plain: 'Only the parts that may be replaced in the field, grouped into ready-made repair kits.',
+        kitchen: 'The list of things a waiter may replace at the table.',
+        from: 'The released EBOM.',
+        how: ['Service and design go through the EBOM and decide which parts can safely be replaced in a hospital.', 'Parts that always travel together become a kit: the castor, its screw and thread-lock.', 'Welded or factory-only parts are left out: a damaged frame means the unit comes back.', 'When a part is redesigned, the service list says which revision replaces which.', 'The list is released and feeds the spare-parts catalogue.'],
+        parts: ['MC-CST-6000', 'MC-GSP-3200', 'MC-MAT-5000'],
+        tree: [[0, 'MC-STR-3000', 'TransPort T-300 serviceable items', ''], [1, 'MC-KIT-6000', 'Castor service kit', 'group'], [2, 'MC-CST-6000', 'Castor with brake ×1', ''], [2, 'MC-FST-0611', 'Fixing screw', 'new'], [2, 'MC-CON-0008', 'Thread-lock capsule', 'new'], [1, 'MC-KIT-6100', 'Brake linkage kit', 'group'], [1, 'MC-KIT-3200', 'Gas spring kit', 'group'], [1, 'MC-KIT-2000', 'Lift column exchange', 'group'], [1, 'MC-KIT-8300', 'Battery pack', 'group'], [1, 'MC-MAT-5000', 'Mattress (single spare part)', '']] },
+      pbom: { name: 'Packaging BOM', term: 'packaging-bom', c: 8, st: 8, q: 'What goes in the box?', pics: [{ ids: [], look: 'packaged', cap: 'Packed on its pallet with the label on the carton.' }], who: 'Manufacturing Engineer with Regulatory Affairs', sys: 'Windchill; used inside the MBOM',
+        plain: 'Everything that goes around and with the stretcher when it ships: carton, protectors, instruction booklet.',
+        kitchen: 'The take-away list: box, napkin, reheating instructions.',
+        from: 'Packaging design and the approved label and instruction content.',
+        how: ['The packaging is designed and tested for transport.', 'Each packaging item gets a part number like any other part.', 'The instruction booklet and labels are added in the right language for each region.', 'The set is released and sits in the MBOM as one line.'],
+        parts: [],
+        tree: [[0, 'MC-PKG-9100', 'Packaging set', ''], [1, 'MC-PKG-9110', 'Shipping carton', ''], [1, 'MC-PKG-9120', 'Corner protector ×8', ''], [1, 'MC-PKG-9130', 'Dust bag', ''], [1, 'IFU-T300', 'Instruction booklet', ''], [1, 'MC-PKG-9140', 'Quick guide card', '']] }
+    },
+    compare: [
+      ['Question it answers', 'What is it made of?', 'In what order do I build it?', 'What can I replace?'],
+      ['Made by', 'Design Engineer', 'Manufacturing Engineer', 'Service + Design Engineer'],
+      ['Made from', 'The 3D model', 'The EBOM', 'The EBOM'],
+      ['Grouped by', 'Function', 'Build order and bench', 'Repair job'],
+      ['Extra items', 'Labels, firmware', 'Thread-lock, oil, packaging', 'Kit screws, seals'],
+      ['One per', 'Product', 'Plant', 'Product'],
+      ['Used by', 'Engineering, purchasing', 'SAP, MES, production', 'Service, spare-part sales']
+    ],
+    castor: 'Follow one part: the castor MC-CST-6000 appears in all three. In the EBOM it sits directly under the stretcher (quantity 4). In the MBOM it sits under "Chassis complete" because that is where it is fitted. In the SBOM it sits inside the castor service kit (quantity 1) with its screw and thread-lock.'
+  },
+
   laneInfo: {
     projectlink: { plain: 'Teamwork & plan', what: 'Who does what, by when. The shared to-do list of the whole project.', like: 'Like the group chat and shared calendar for a school project.',
       short: ['Set up team', 'Share designs', 'Track BOM tasks', 'Freeze gate', 'Factory joins', 'Go-live checklist', 'Log pilot issues', 'Launch gate', 'Lessons learned', 'New projects'] },

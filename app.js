@@ -65,21 +65,29 @@
     return ids.slice(0, 5);
   }
   // A figure that is filled with a rendered picture by hydrateSnaps(). ids = [] shows the whole stretcher.
-  function snapFig(ids) {
-    ids = ids || [];
-    var cap = ids.length
+  // o.look = lifecycle look, o.ex = exploded amount 0..1, o.cap = caption text.
+  function snapFig(ids, o) {
+    ids = ids || []; o = o || {};
+    var cap = o.cap ? esc(o.cap) : (ids.length
       ? 'Highlighted: ' + ids.map(function (id) { return '<button type="button" class="term plink" data-part="' + id + '" data-tip="' + esc(partById[id].name) + '">' + esc(partById[id].name) + '</button>'; }).join(', ')
-      : 'The whole ' + esc(MD.product.name) + ' stretcher';
-    return '<figure class="pfig" data-snap="' + ids.join(',') + '"><img alt="" hidden><figcaption>' + cap + '</figcaption></figure>';
+      : 'The whole ' + esc(MD.product.name) + ' stretcher');
+    return '<figure class="pfig" data-snap="' + ids.join(',') + '" data-look="' + (o.look || '') + '" data-ex="' + (o.ex || 0) + '"><img alt="" hidden><figcaption>' + cap + '</figcaption></figure>';
   }
   function hydrateSnaps(root) {
     $$('.pfig[data-snap]', root).forEach(function (f) {
       var ids = f.getAttribute('data-snap'), img = $('img', f);
-      var url = window.Stretcher3D && window.Stretcher3D.snapshot ? window.Stretcher3D.snapshot(ids ? ids.split(',') : []) : null;
+      var url = window.Stretcher3D && window.Stretcher3D.snapshot ? window.Stretcher3D.snapshot(ids ? ids.split(',') : [], 0, 0, f.getAttribute('data-look') || '', +f.getAttribute('data-ex') || 0) : null;
       if (!url) { f.hidden = true; return; }
       img.src = url; img.hidden = false;
       img.alt = '3D picture of the stretcher' + (ids ? ' with these parts in colour: ' + ids.split(',').map(function (id) { return partById[id].name; }).join(', ') : '');
     });
+  }
+
+  /* ---------------- the restaurant picture: one comparison used everywhere ---------------- */
+  function kitchenNote(text) { return text ? '<p class="kitchen-note"><b>In the restaurant</b>' + esc(text) + '</p>' : ''; }
+  function analogyHtml(t) {
+    var k = MD.kitchen.terms[t.id];
+    return k ? '<div class="analogy kitchen"><b>In the restaurant</b>' + esc(k) + '</div>' : '<div class="analogy"><b>Everyday analogy</b>' + rich(t.analogy) + '</div>';
   }
 
   /* Stage icons: simple line drawings, 24 x 24. */
@@ -171,7 +179,7 @@
     openDrawer({
       kicker: t.cat, title: t.n, sub: esc(t.tip), expertTab: 1,
       tabs: [
-        { label: 'Simple', html: '<p>' + rich(t.simple) + '</p><div class="analogy"><b>Everyday analogy</b>' + rich(t.analogy) + '</div>' + extra },
+        { label: 'Simple', html: '<p>' + rich(t.simple) + '</p>' + analogyHtml(t) + extra },
         { label: 'Expert', html: '<p>' + rich(t.expert) + '</p>' + extra },
         { label: 'In our stretcher', html: '<p>' + rich(t.ex) + '</p>' + snapFig(partsIn(t.ex, parts.slice(0, 3).map(function (p) { return p.id; }))) + '<p class="tnote">Sample data, invented for training.</p>' },
         { label: 'Related', html:
@@ -251,7 +259,8 @@
       '<p class="lead">' + (state.level === 'expert'
         ? rich('This site follows one product through [[creo]], [[windchill]] 13, [[sap]] and [[mes]] under [[qmsr]], [[iso13485]], [[iso14971]] and [[eumdr]], with sample objects, states, records and audit evidence at each step.')
         : 'This site follows one stretcher through all 10 stages. Every underlined word explains itself: hover for one line, click for the full story.') + '</p>' +
-      '<div class="w-actions"><button type="button" class="btn" data-play>▶ Play the journey</button><button type="button" class="btn ghost" data-go-stage="1">Begin at stage 1</button><a class="btn ghost" href="#trace">Follow a part</a><a class="btn ghost" href="#glossary">Open the glossary</a></div></div>' +
+      '<p class="lead">' + esc(MD.kitchen.intro) + ' <a href="#kitchen">See the restaurant picture</a>.</p>' +
+      '<div class="w-actions"><button type="button" class="btn" data-play>▶ Play the journey</button><a class="btn ghost" href="#story">Read ' + esc(MD.story.name) + '\'s story</a><button type="button" class="btn ghost" data-go-stage="1">Begin at stage 1</button><a class="btn ghost" href="#trace">Follow a part</a><a class="btn ghost" href="#glossary">Open the glossary</a></div></div>' +
       '<div class="how"><h3>How to use this page</h3><ol>' +
       '<li><span><b>Pick a stage</b> on the journey map. The 3D stretcher changes its look to match: sketch, CAD model, managed in Windchill, built, packed, in use.</span></li>' +
       '<li><span><b>Hover or click anything underlined</b>, such as ' + rich('[[udi]] or [[ebom]]') + ', and any part of the 3D model.</span></li>' +
@@ -295,7 +304,7 @@
   function renderStagePanel() {
     var s = MD.stages[state.stage - 1];
     var h = '<div><div class="kicker">Stage ' + s.n + ' of ' + MD.stages.length + '</div><h2>' + esc(s.name) + '</h2></div>' +
-      '<p class="tag">' + rich(lv(s.tagline)) + '</p><p>' + rich(lv(s.purpose)) + '</p>' +
+      '<p class="tag">' + rich(lv(s.tagline)) + '</p><p>' + rich(lv(s.purpose)) + '</p>' + kitchenNote(MD.kitchen.stages[s.n - 1]) +
       roleTasksHtml(s) + '<div class="sp-sec"><h3>Systems involved</h3><div class="sys-row">' + s.sys.map(sysChip).join('') + '</div></div>' +
       '<div class="w-actions"><a class="btn" href="#stage-' + s.n + '">Open the stage ' + s.n + ' page</a>' +
       (s.n < MD.stages.length ? '<button type="button" class="btn ghost" data-stage-sel="' + (s.n + 1) + '">Next stage →</button>' : '') + '</div>' +
@@ -398,7 +407,7 @@
     var h = crumbs([['Journey', '#home'], ['Stage ' + n + ' · ' + s.name]]) + progress(n) +
       '<header class="page-head" style="--c:var(--s' + n + ')"><div class="kicker">Stage ' + n + ' of ' + MD.stages.length + ' · ' + (state.level === 'expert' ? 'Expert view' : 'Simple view') + '</div><h1>' + esc(s.name) + '</h1><p class="tag">' + rich(lv(s.tagline)) + '</p>' +
       '<div class="w-actions"><button type="button" class="btn ghost" data-go-stage="' + n + '">See the stretcher at this stage</button></div></header>';
-    h += '<section class="sec"><h2>Purpose</h2><p class="prose">' + rich(lv(s.purpose)) + '</p></section>';
+    h += '<section class="sec"><h2>Purpose</h2><p class="prose">' + rich(lv(s.purpose)) + '</p>' + kitchenNote(MD.kitchen.stages[n - 1]) + '</section>';
     if (!s.full) {
       h += '<section class="sec"><p class="notice">This stage shows its summary now. The full page with sample tables, Windchill objects, RACI, compliance evidence, pitfalls and best practices arrives in Phase 2.</p></section>';
     } else {
@@ -585,7 +594,7 @@
         return '<button type="button" class="lane-card" data-lane="' + l.id + '" data-lane-stage="' + s.n + '" style="--c:var(--s' + [7, 2, 10, 4, 6][li % 5] + ')">' +
           '<span class="lc-head"><i class="lane-ic">' + laneIcon(l.id) + '</i><span><b>' + esc(info.plain || l.name) + '</b><small>' + esc(l.name) + '</small></span></span>' +
           '<span class="lc-now">' + esc(l.cells[s.n - 1]) + '</span>' +
-          '<span class="lc-what">' + esc(info.what || '') + ' ' + esc(info.like || '') + '</span></button>';
+          '<span class="lc-what">' + esc(info.what || '') + ' ' + esc(MD.kitchen.lanes[l.id] ? 'In the restaurant: ' + MD.kitchen.lanes[l.id] : (info.like || '')) + '</span></button>';
       }).join('') + '</div>';
   }
 
@@ -612,7 +621,7 @@
     var sel = $('#roleSel'); if (sel) sel.value = state.role;
     var y = window.scrollY; route(); window.scrollTo(0, y);
   }
-  function isHomeRoute() { var h = (location.hash || '#home').slice(1); return !/^(stage-\d+|parts|glossary|trace|capa|roles|modules)$/.test(h); }
+  function isHomeRoute() { var h = (location.hash || '#home').slice(1); return !/^(stage-\d+|parts|glossary|trace|capa|roles|modules|story|kitchen|boms)$/.test(h); }
 
   /* ---------------- ROLES page ---------------- */
   function renderRolesPage() {
@@ -632,6 +641,10 @@
     h += '<section class="sec"><h2>Tasks and approvals</h2><div class="table-scroll"><table><thead><tr><th>Stage</th><th>Activity</th><th>Part</th><th>Electronic signature</th></tr></thead><tbody>' +
       tasks.map(function (t) { return '<tr><td><a href="#stage-' + t.st + '">' + t.st + ' · ' + esc(MD.stages[t.st - 1].short) + '</a></td><td>' + esc(t.act) + '</td><td><span class="pill">' + t.v + ' · ' + RACI_WORD[t.v] + '</span></td><td>' + (t.sig ? '<span class="sig">✍ signs under Part 11</span>' : '—') + '</td></tr>'; }).join('') +
       '</tbody></table></div><p class="tnote">' + rich('This role gives ' + sigs.length + ' approvals that need a [[part11]] [[esign|electronic signature]]: user ID and password are entered again at the moment of signing.') + '</p></section>';
+    var dayRows = MD.days[id] || [];
+    if (dayRows.length) h += '<section class="sec"><h2>A day in the life of ' + esc(MD.people[id]) + ', ' + esc(r.name) + '</h2><ol class="day">' + dayRows.map(function (d) {
+      return '<li><span class="day-t">' + esc(d[0]) + '</span><div><h3>' + esc(d[1]) + (d[4] ? ' <span class="sig" data-tip="Signs electronically: user ID and password are entered again.">✍ signs</span>' : '') + '</h3><p>' + esc(d[2]) + '</p><p class="tnote">Screen: ' + esc(d[3]) + '</p></div></li>';
+    }).join('') + '</ol><p class="tnote">An invented but typical day. Names are made up.</p></section>';
     h += '<div class="cols2"><section class="sec"><h2>Screens this role works in</h2>' + list(info.screens) + '</section><section class="sec"><h2>What this role delivers</h2>' + list(info.deliv) + '</section></div>';
     var matrix = '<div class="table-scroll"><table class="raci"><thead><tr><th>Stage</th><th>Activity</th>' + MD.roles.map(function (x) { return '<th' + (x.id === id ? ' class="me"' : '') + ' data-tip="' + esc(x.name) + '">' + x.id + '</th>'; }).join('') + '</tr></thead><tbody>';
     MD.stages.forEach(function (s) { (s.raci ? s.raci.rows : []).forEach(function (row) {
@@ -702,16 +715,32 @@
     if (e.key === 'ArrowRight') { state.capaStep++; fillCapa(); }
     if (e.key === 'ArrowLeft') { state.capaStep--; fillCapa(); }
   });
+  document.addEventListener('keydown', function (e) {
+    if (state.route !== 'story' || !drawer.hidden || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'ArrowRight') { story.i++; fillStory(); }
+    if (e.key === 'ArrowLeft') { story.i--; fillStory(); }
+  });
 
   /* ---------------- PLAY THE JOURNEY: guided tour ---------------- */
   var tour = { on: false, playing: false, i: 1, speed: 1, elapsed: 0, last: 0, raf: 0, DUR: 10000 };
   function tourOpen() {
     if (!isHomeRoute()) { location.hash = '#home'; setTimeout(tourOpen, 80); return; }
     tour.on = true; $('#tour').hidden = false; document.body.classList.add('touring');
+    tour.playing = false; tour.spoken = false; tourVoiceBtn();
     tourGo(1); tourPlay(true);
     var m = $('.two'); if (m) m.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });   // keep the 3D stretcher in view
     cancelAnimationFrame(tour.raf); tour.last = performance.now(); tour.raf = requestAnimationFrame(tourTick);
     $('#tPlay').focus();
+  }
+  function tourVoiceBtn() {
+    var b = $('#tVoice'); b.hidden = !voice.ok;
+    b.textContent = voice.on ? '🔊' : '🔇'; b.setAttribute('aria-label', voice.on ? 'Mute narration' : 'Turn narration on');
+  }
+  function tourSpeak() {
+    tour.spoken = false; tour.fallback = false;
+    var t0 = performance.now();
+    var ok = say(MD.tour[tour.i - 1], tour.speed, function () { if (performance.now() - t0 < 1000) tour.fallback = true; else tour.spoken = true; });
+    if (!ok) tour.fallback = true;   // no voice available: fall back to the timer
   }
   function tourGo(n) {
     tour.i = Math.max(1, Math.min(MD.stages.length, n)); tour.elapsed = 0;
@@ -722,13 +751,16 @@
     $('#tourCap').innerHTML = '<b style="--c:var(--s' + s.n + ')">' + s.n + ' · ' + esc(s.name) + '</b>' + esc(MD.tour[tour.i - 1]);
     $('#tJump').value = tour.i;
     $('#tourDots').innerHTML = MD.stages.map(function (x) { return '<i style="--c:var(--s' + x.n + ')" class="' + (x.n === tour.i ? 'on' : (x.n < tour.i ? 'done' : '')) + '"></i>'; }).join('');
+    tour.estimate = MD.tour[tour.i - 1].length * 62;
+    if (tour.playing) tourSpeak(); else { hush(); tour.spoken = false; }
   }
   function tourPlay(on) {
     tour.playing = on; var b = $('#tPlay');
     b.textContent = on ? '⏸' : '▶'; b.setAttribute('aria-label', on ? 'Pause' : 'Play');
+    if (on) { if (!tour.spoken) { tour.elapsed = 0; tourSpeak(); } } else hush();
   }
   function tourClose() {
-    tour.on = false; tour.playing = false; cancelAnimationFrame(tour.raf);
+    tour.on = false; tour.playing = false; cancelAnimationFrame(tour.raf); hush();
     $('#tour').hidden = true; document.body.classList.remove('touring');
     var sl = $('#explode'); sl.value = 0; if (window.Stretcher3D) window.Stretcher3D.setExplode(0);
   }
@@ -736,17 +768,114 @@
     if (!tour.on) return;
     tour.raf = requestAnimationFrame(tourTick);
     var dt = Math.min(1500, ts - tour.last); tour.last = ts;   // generous cap so a throttled tab still advances
+    var voiced = voice.ok && voice.on && !tour.fallback;
     if (tour.playing) {
       tour.elapsed += dt * tour.speed;
       if (!reduced && window.Stretcher3D && window.Stretcher3D.orbit) window.Stretcher3D.orbit(dt / 1000 * 0.160 * tour.speed);
-      if (tour.elapsed >= tour.DUR) { if (tour.i < MD.stages.length) tourGo(tour.i + 1); else { tour.elapsed = tour.DUR; tourPlay(false); } }
+      // with narration, wait for the voice to finish; without it, use the timer
+      var done = voiced ? ((tour.spoken && tour.elapsed >= 3000) || tour.elapsed >= Math.max(14000, tour.estimate * 2.2)) : tour.elapsed >= tour.DUR;
+      if (done) { if (tour.i < MD.stages.length) tourGo(tour.i + 1); else { tourPlay(false); tour.spoken = true; } }
     }
-    $('#tourFill').style.width = (((tour.i - 1) + Math.min(1, tour.elapsed / tour.DUR)) / MD.stages.length * 100) + '%';
+    var frac = voiced ? Math.min(0.97, tour.elapsed / Math.max(1, tour.estimate)) : Math.min(1, tour.elapsed / tour.DUR);
+    $('#tourFill').style.width = (((tour.i - 1) + frac) / MD.stages.length * 100) + '%';
   }
   document.addEventListener('keydown', function (e) {
     if (!tour.on || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
     if (e.key === 'Escape') tourClose();
   });
+
+  /* =====================================================================
+     PHASE 4: voice, story mode, restaurant view, how BOMs are made
+     ===================================================================== */
+  var voice = { ok: ('speechSynthesis' in window) && typeof window.SpeechSynthesisUtterance !== 'undefined', on: store.get('md-voice', '1') === '1', tok: 0 };
+  // Reads text aloud with the browser's own voice. Returns false when no voice is available.
+  function say(text, rate, done) {
+    if (!voice.ok || !voice.on) return false;
+    try {
+      var tok = ++voice.tok; window.speechSynthesis.cancel();
+      var u = new window.SpeechSynthesisUtterance(text);
+      u.rate = Math.max(0.7, Math.min(1.6, rate || 1)); u.lang = 'en-GB';
+      u.onend = u.onerror = function () { if (tok === voice.tok && done) done(); };
+      window.speechSynthesis.speak(u); return true;
+    } catch (e) { return false; }
+  }
+  function hush() { voice.tok++; if (voice.ok) { try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } } }
+
+  /* ---------------- STORY MODE ---------------- */
+  var story = { i: 0, read: false };
+  function renderStoryPage() {
+    return crumbs([['Journey', '#home'], ['Story']]) +
+      '<header class="page-head" style="--c:var(--s1)"><div class="kicker">Story mode · no jargon</div><h1>The life of ' + esc(MD.story.name) + ' the stretcher</h1>' +
+      '<p class="tag">Ten pages, one picture each. Read it yourself or let it be read to you. No technical words needed.</p></header>' +
+      '<section class="sec story" id="storyBox" aria-live="polite"></section>';
+  }
+  function fillStory() {
+    var P = MD.story.pages; story.i = Math.max(0, Math.min(P.length - 1, story.i));
+    var p = P[story.i], s = MD.stages[p.st - 1], i = story.i;
+    $('#storyBox').innerHTML = '<div class="story-grid" style="--c:var(--s' + p.st + ')">' +
+      snapFig([], { look: p.look, cap: MD.story.name + ' on page ' + (i + 1) }) +
+      '<div class="story-text"><div class="kicker">Page ' + (i + 1) + ' of ' + P.length + '</div><h2>' + esc(p.h) + '</h2><p class="story-p">' + esc(p.t) + '</p>' +
+      kitchenNote(MD.kitchen.stages[p.st - 1]) +
+      '<p class="tnote">Professionals call this <a href="#stage-' + s.n + '">stage ' + s.n + ' · ' + esc(s.name) + '</a>.</p>' +
+      '<div class="story-dots">' + P.map(function (x, k) { return '<button type="button" data-story-step="' + k + '" class="' + (k === i ? 'on' : (k < i ? 'done' : '')) + '" style="--c:var(--s' + x.st + ')" aria-label="Page ' + (k + 1) + ': ' + esc(x.h) + '"></button>'; }).join('') + '</div>' +
+      '<div class="w-actions">' + (i > 0 ? '<button type="button" class="btn ghost" data-story-step="' + (i - 1) + '">← Back</button>' : '') +
+      (voice.ok ? '<button type="button" class="btn ghost" data-story-read>' + (story.read ? '⏸ Stop reading' : '🔊 Read it to me') + '</button>' : '') +
+      (i < P.length - 1 ? '<button type="button" class="btn" data-story-step="' + (i + 1) + '">Next page →</button>' : '<a class="btn" href="#home">See the full journey</a>') + '</div></div></div>';
+    hydrateSnaps($('#storyBox'));
+    if (story.read) storySpeak(); else hush();
+  }
+  function storySpeak() {
+    var P = MD.story.pages, p = P[story.i], t0 = performance.now();
+    var ok = say(p.h + '. ' + p.t, 1, function () {
+      if (performance.now() - t0 < 1000 || !story.read || state.route !== 'story') return;
+      if (story.i < P.length - 1) setTimeout(function () { if (story.read && state.route === 'story') { story.i++; fillStory(); } }, 700);
+      else { story.read = false; fillStory(); }
+    });
+    if (!ok) story.read = false;
+  }
+
+  /* ---------------- RESTAURANT VIEW ---------------- */
+  function renderKitchenPage() {
+    var K = MD.kitchen, ids = Object.keys(K.terms).filter(function (id) { return MD.terms[id]; });
+    return crumbs([['Journey', '#home'], ['Restaurant view']]) +
+      '<header class="page-head" style="--c:var(--s2)"><div class="kicker">One picture for everything</div><h1>Think of a restaurant</h1><p class="tag">' + esc(K.intro) + '</p></header>' +
+      '<section class="sec"><h2>The 10 stages, twice</h2><div class="table-scroll"><table><thead><tr><th>Stage</th><th>With the stretcher</th><th>In the restaurant</th></tr></thead><tbody>' +
+      MD.stages.map(function (s) { return '<tr><td><a href="#stage-' + s.n + '"><b>' + s.n + ' · ' + esc(s.short) + '</b></a></td><td>' + esc(s.tagline.s) + '</td><td>' + esc(K.stages[s.n - 1]) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
+      '<section class="sec"><h2>The five teams, in the restaurant</h2><div class="table-scroll"><table><thead><tr><th>Team</th><th>In the restaurant</th></tr></thead><tbody>' +
+      MD.lanes.map(function (l) { return '<tr><td><b>' + esc((MD.laneInfo[l.id] || {}).plain || l.name) + '</b><br><span class="tnote">' + esc(l.name) + '</span></td><td>' + esc(K.lanes[l.id] || '') + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
+      '<section class="sec"><h2>Technical words and their restaurant twins</h2><p class="tnote">Select a word for the full explanation.</p><div class="g-grid">' +
+      ids.map(function (id) { return '<button type="button" class="g-item" data-term="' + id + '"><b>' + esc(MD.terms[id].n) + '</b><small>' + esc(K.terms[id]) + '</small></button>'; }).join('') + '</div></section>';
+  }
+
+  /* ---------------- HOW EACH BOM IS MADE ---------------- */
+  var BOM_TAG = { 'new': ['Added in this list', 'warn'], group: ['Group made for this list', ''] };
+  function bomTree(rows) {
+    return '<ul class="bom-tree">' + rows.map(function (r) {
+      var tag = BOM_TAG[r[3]];
+      return '<li class="lv' + r[0] + (r[3] ? ' t-' + r[3] : '') + '"><span class="mono">' + esc(r[1]) + '</span><span>' + esc(r[2]) + '</span>' + (tag ? '<span class="pill ' + tag[1] + '">' + tag[0] + '</span>' : '') + '</li>';
+    }).join('') + '</ul>';
+  }
+  function renderBomsPage() {
+    var B = MD.boms, box = function (id, extra) { var b = B.list[id]; return '<button type="button" class="bf" data-scroll="bom-' + id + '" style="--c:var(--s' + b.c + ')"><b>' + esc(b.name) + '</b><small>' + esc(b.q) + '</small>' + (extra || '') + '</button>'; };
+    var h = crumbs([['Journey', '#home'], ['How BOMs are made']]) +
+      '<header class="page-head" style="--c:var(--s3)"><div class="kicker">Parts lists explained</div><h1>How each BOM is made</h1><p class="tag">' + esc(B.intro) + '</p></header>';
+    h += '<section class="sec"><h2>One set of parts, several lists</h2><div class="bom-flow"><span class="bf plain" style="--c:var(--s2)"><b>3D model</b><small>Built in Creo</small></span><i>→</i>' + box('ebom') + '<i>→</i>' + box('mbom') + '<i>→</i>' + box('sapbom') + '</div>' +
+      '<div class="bom-flow"><span class="bf-note">The EBOM also feeds</span><i>→</i>' + box('sbom') + '<span class="bf-note">and the packaging list goes into the MBOM</span><i>←</i>' + box('pbom') + '</div>' +
+      '<p class="tnote">Select a box to jump to it.</p></section>';
+    B.order.forEach(function (id) {
+      var b = B.list[id];
+      h += '<section class="sec bom-sec" id="bom-' + id + '" style="--c:var(--s' + b.c + ')"><div class="bom-head"><div><div class="kicker">' + esc(b.q) + '</div><h2 style="font-size:1.35rem">' + rich('[[' + b.term + '|' + b.name + ']]') + '</h2></div><a class="chip" href="#stage-' + b.st + '">Stage ' + b.st + ' · ' + esc(MD.stages[b.st - 1].short) + '</a></div>' +
+        '<p class="prose">' + esc(b.plain) + '</p>' + kitchenNote(b.kitchen) +
+        (b.pics && b.pics.length ? '<div class="bom-pics">' + b.pics.map(function (p) { return snapFig(p.ids || [], { look: p.look, ex: p.ex, cap: p.cap }); }).join('') + '</div>' : '') +
+        '<div class="cols2"><div><h3 class="sub">How it is made</h3><ol class="bul">' + b.how.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>' +
+        '<dl class="kv" style="margin-top:12px"><dt>Made by</dt><dd>' + esc(b.who) + '</dd><dt>Made from</dt><dd>' + esc(b.from) + '</dd><dt>Lives in</dt><dd>' + esc(b.sys) + '</dd></dl></div>' +
+        '<div><h3 class="sub">What it looks like</h3>' + bomTree(b.tree) + '</div></div></section>';
+    });
+    h += '<section class="sec"><h2>Side by side</h2><div class="table-scroll"><table><thead><tr><th></th><th>Engineering BOM</th><th>Manufacturing BOM</th><th>Service BOM</th></tr></thead><tbody>' +
+      B.compare.map(function (r) { return '<tr><td><b>' + esc(r[0]) + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+      '<div class="cols2"><div>' + snapFig(['MC-CST-6000']) + '</div><p class="notice">' + rich(B.castor.replace('MC-CST-6000', '[[p:MC-CST-6000]]')) + '</p></div></section>';
+    return h;
+  }
 
   /* ---------------- routing ---------------- */
   function route() {
@@ -757,12 +886,16 @@
     else if (hsh === 'parts') { state.route = 'parts'; page.innerHTML = renderPartsPage(); }
     else if (hsh === 'glossary') { state.route = 'glossary'; page.innerHTML = renderGlossaryPage(); fillGlossary(); }
     else if (hsh === 'trace') { state.route = 'trace'; page.innerHTML = renderTracePage(); playTrace(); }
+    else if (hsh === 'story') { state.route = 'story'; page.innerHTML = renderStoryPage(); fillStory(); }
+    else if (hsh === 'kitchen') { state.route = 'kitchen'; page.innerHTML = renderKitchenPage(); }
+    else if (hsh === 'boms') { state.route = 'boms'; page.innerHTML = renderBomsPage(); }
     else if (hsh === 'capa') { state.route = 'capa'; page.innerHTML = renderCapaPage(); fillCapa(); }
     else if (hsh === 'roles') { state.route = 'roles'; page.innerHTML = renderRolesPage(); }
     else if (hsh === 'modules') { state.route = 'modules'; page.innerHTML = renderModulesPage(); fillModules(); }
     else { state.route = 'home'; }
     if (!isHomeRoute() && tour.on) tourClose();
     if (hsh !== 'trace') clearInterval(trace.timer);
+    if (hsh !== 'story') { story.read = false; if (!tour.on) hush(); }
     initMinis();
     if (state.route !== 'home') hydrateSnaps(page);
     var isHome = state.route === 'home';
@@ -808,6 +941,10 @@
     }
     if ((el = t.closest('[data-trace-replay]'))) { playTrace(); return; }
     if ((el = t.closest('[data-play]'))) { tourOpen(); return; }
+    if ((el = t.closest('[data-story-step]'))) { story.i = +el.getAttribute('data-story-step'); fillStory(); return; }
+    if ((el = t.closest('[data-story-read]'))) { story.read = !story.read; if (story.read) { voice.on = true; store.set('md-voice', '1'); } fillStory(); return; }
+    if ((el = t.closest('[data-scroll]'))) { var tg = document.getElementById(el.getAttribute('data-scroll')); if (tg) tg.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); return; }
+    if ((el = t.closest('#tVoice'))) { voice.on = !voice.on; store.set('md-voice', voice.on ? '1' : '0'); tourVoiceBtn(); if (voice.on && tour.playing) { tour.elapsed = 0; tourSpeak(); } else hush(); return; }
     if ((el = t.closest('[data-capa-step]'))) { state.capaStep = +el.getAttribute('data-capa-step'); fillCapa(true); return; }
     if ((el = t.closest('[data-role-pick]'))) { setRole(el.getAttribute('data-role-pick')); return; }
     if ((el = t.closest('[data-mod-filter]'))) { state.mf = el.getAttribute('data-mod-filter'); fillModules(); return; }

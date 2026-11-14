@@ -392,10 +392,12 @@
   /* Still picture of the stretcher with the given parts in full colour and the
      rest ghosted. Returns a PNG data URL (cached), or null when 3D is unavailable. */
   var snapCache = {};
-  api.snapshot = function (ids, w, h) {
+  api.snapshot = function (ids, w, h, look, ex) {
+    ex = Math.max(0, Math.min(1, +ex || 0));
     if (!api.ready) return null;
     ids = (ids || []).filter(Boolean);
-    var key = (ids.length ? ids.join(',') : 'all') + '|' + theme + '|' + powered;
+    var L = look && MODES[look] ? MODES[look] : null;
+    var key = (ids.length ? ids.join(',') : 'all') + '|' + theme + '|' + powered + '|' + (L ? look : '') + '|' + ex;
     if (snapCache[key]) return snapCache[key];
     w = w || 520; h = h || 320;
     var focus = {}, all = !ids.length, url = null;
@@ -403,7 +405,7 @@
     var gSaved = groups.map(function (g) { return [g.visible, g.scale.x, g.position.clone()]; });
     var rootY = root.position.y; root.position.y = 0;
     groups.forEach(function (g) {
-      var u = g.userData; g.position.copy(u.base); g.scale.setScalar(1);
+      var u = g.userData; g.position.copy(u.base).addScaledVector(u.ex, ex); g.scale.setScalar(1);
       g.visible = !u.opt || powered || !!focus[u.partId];
     });
     root.updateMatrixWorld(true);
@@ -414,17 +416,25 @@
       var mat = m.material, e = m.userData.edge, em = e.material;
       var s = [mat.color.getHex(), mat.opacity, mat.emissive.getHex(), mat.emissiveIntensity, mat.depthWrite, em.opacity, em.color.getHex(), e.visible];
       var f = all || !!focus[m.userData.partId];
-      mat.color.copy(m.userData.real); mat.opacity = f ? 1 : 0.06; mat.emissive.set(0x000000); mat.emissiveIntensity = 0; mat.depthWrite = f;
-      em.opacity = f ? 0 : 0.3; em.color.set(INK[theme]); e.visible = !f;
+      if (L) {   // whole stretcher drawn in a lifecycle look
+        mat.color.copy(m.userData.real); if (L.col != null) mat.color.set(L.col).lerp(m.userData.real, 0.12);
+        mat.opacity = L.op; mat.emissive.set(L.em); mat.emissiveIntensity = L.ei; mat.depthWrite = L.op > 0.6;
+        em.opacity = L.edge; em.color.set(L.edgeCol === 'ink' ? INK[theme] : L.edgeCol); e.visible = L.edge > 0.02;
+      } else {
+        mat.color.copy(m.userData.real); mat.opacity = f ? 1 : 0.06; mat.emissive.set(0x000000); mat.emissiveIntensity = 0; mat.depthWrite = f;
+        em.opacity = f ? 0 : 0.3; em.color.set(INK[theme]); e.visible = !f;
+      }
       return s;
     });
     var keys = ['windchill', 'plant', 'packaged', 'hospital', 'service'], pSaved = keys.map(function (k) { var v = props[k].visible; props[k].visible = false; return v; });
+    var scenery = L && props[look] ? props[look] : null;
+    if (scenery) { scenery.visible = true; scenery.traverse(function (o) { if (o.material) { o.material.opacity = o.material.userData.o; o.material.depthWrite = o.material.userData.o > 0.9; if (o.userData.pulse) o.scale.set(1, 1, 1); } }); }
     var size = new T.Vector2(); renderer.getSize(size);
     var camPos = camera.position.clone(), camAspect = camera.aspect;
     try {
       renderer.setSize(w, h, false);
       var c = box.getCenter(new T.Vector3()), rad = Math.max(box.getSize(new T.Vector3()).length() / 2, 0.28);
-      var dist = Math.max(rad / Math.sin(camera.fov * Math.PI / 360) * 0.82, 1.1), th = -0.78, ph = 1.05, sp = Math.sin(ph);
+      var dist = Math.max(rad / Math.sin(camera.fov * Math.PI / 360) * (scenery ? 1.05 : 0.98), 1.1), th = L ? L.cam.th : -0.78, ph = L ? L.cam.ph : 1.05, sp = Math.sin(ph);
       camera.aspect = w / h; camera.updateProjectionMatrix();
       camera.position.set(c.x + dist * sp * Math.sin(th), c.y + dist * Math.cos(ph), c.z + dist * sp * Math.cos(th)); camera.lookAt(c);
       renderer.render(scene, camera);

@@ -445,3 +445,53 @@ tr.dimrow td.me { opacity: 1; }
 .iconbtn.big { width: 44px; height: 44px; background: var(--grad); color: #fff; border-color: transparent; font-size: 1.1rem; }
 body.touring { padding-bottom: 150px; }
 .roadmap h3 a { color: inherit; }
+
+
+/* ================= Phase 4 ================= */
+.kitchen-note { background: color-mix(in srgb, var(--s2) 14%, var(--surface)); border-left: 5px solid var(--s2); border-radius: 10px; padding: 10px 14px; font-size: .92rem; max-width: 75ch; }
+.kitchen-note b { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--warn); margin-bottom: 2px; }
+.analogy.kitchen { background: color-mix(in srgb, var(--s2) 16%, var(--surface)); }
+.welcome .lead a { color: #ffe27a; }
+
+/* story mode */
+.story-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+@media (max-width: 860px) { .story-grid { grid-template-columns: minmax(0, 1fr); } }
+.story-grid .pfig { border: 4px solid var(--c); }
+.story-text { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.story-text h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); }
+.story-p { font-size: 1.15rem; line-height: 1.6; }
+.story-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.story-dots button { all: unset; cursor: pointer; width: 26px; height: 10px; border-radius: 5px; background: color-mix(in srgb, var(--c) 30%, transparent); }
+.story-dots button.done, .story-dots button.on { background: var(--c); }
+.story-dots button.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+.story-dots button:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+/* a day in the life */
+.day { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.day li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 10px 0 14px; position: relative; }
+.day li::before { content: ""; position: absolute; left: 31px; top: 40px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--line); }
+.day li:last-child::before { display: none; }
+.day-t { font-family: var(--mono); font-weight: 700; font-size: .84rem; background: var(--grad); color: #fff; border-radius: 999px; padding: 4px 0; text-align: center; height: fit-content; position: relative; }
+.day h3 { font-size: 1rem; margin-bottom: 2px; }
+.day p { font-size: .92rem; }
+
+/* how BOMs are made */
+.bom-flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bom-flow i { font-style: normal; font-weight: 700; color: var(--muted); font-size: 1.2rem; }
+.bf { all: unset; cursor: pointer; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 14px; border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 14%, var(--surface)); max-width: 230px; }
+.bf.plain { cursor: default; }
+.bf b { font-size: .92rem; } .bf small { font-size: .76rem; color: var(--muted); }
+.bf:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.bf-note { font-size: .84rem; color: var(--muted); }
+.bom-sec { border-top: 6px solid var(--c); scroll-margin-top: 90px; }
+.bom-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+.bom-sec .kicker { color: var(--ink); background: color-mix(in srgb, var(--c) 30%, transparent); display: inline-block; padding: 2px 10px; border-radius: 999px; margin-bottom: 4px; }
+.bom-pics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.bom-pics .pfig { max-width: 520px; }
+h3.sub { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.bom-tree { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: .88rem; }
+.bom-tree li { display: flex; gap: 6px 10px; flex-wrap: wrap; align-items: baseline; padding: 5px 10px; border-radius: 8px; background: var(--surface-2); border-left: 4px solid var(--c); }
+.bom-tree .lv0 { font-weight: 700; }
+.bom-tree .lv1 { margin-left: 18px; } .bom-tree .lv2 { margin-left: 36px; }
+.bom-tree .t-new { background: var(--warn-bg); border-left-color: var(--warn); }
+.bom-tree .t-group { background: color-mix(in srgb, var(--c) 16%, var(--surface)); font-weight: 600; }

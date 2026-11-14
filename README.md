@@ -13,7 +13,11 @@ It is written for engineering teams, new joiners and non-technical readers. Ever
 ## Features
 
 - "Start here" welcome with a 30-second explanation
-- **Play the journey**: a guided tour that walks through all 10 stages with narration, while the 3D stretcher changes its look. Play / pause, previous / next, speed, jump to stage, progress bar
+- **Story mode**: the stretcher's life as a 10-page picture book with no jargon, which the browser can read aloud
+- **Restaurant view**: one everyday comparison (a restaurant putting a new dish on the menu) used across stages, teams and terms
+- **How BOMs are made**: engineering, manufacturing, SAP, service and packaging parts lists explained side by side, each with 3D pictures, the steps that create it and its tree
+- **A day in the life**: for each of the 11 roles, a short timeline of a working day with the screens used and what gets signed
+- **Play the journey**: a guided tour that walks through all 10 stages with spoken narration (with a mute button), while the 3D stretcher changes its look. Play / pause, previous / next, speed, jump to stage, progress bar
 - Animated journey map of the 10 stages. Underneath, five teams work alongside (teamwork, suppliers, safety risks, quality checks, legal approval), each with a plain-language label per stage and example cards
 - 3D stretcher built from Three.js primitives: orbit, zoom, explode view, hover tooltips, click a part for details, optional powered drive module
 - Lifecycle looks for the 3D model: idea sketch → Creo CAD → managed in Windchill → released → plant bench → packed with UDI label → in hospital → service
